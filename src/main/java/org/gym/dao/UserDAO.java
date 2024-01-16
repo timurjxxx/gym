@@ -41,7 +41,7 @@ public class UserDAO {
 
     }
 
-    public String findByUsername(String username) {
+    public User findByUsername(String username) {
 
         LOGGER.info("Find user by uer name");
         for (Map<Long, Object> innerMap : storage.getStorageMap().values()) {
@@ -50,7 +50,7 @@ public class UserDAO {
                     User user = (User) obj;
                     String userUsername = user.getUserName();
                     if (userUsername != null && userUsername.equals(username)) {
-                        return username = userUsername;
+                        return user;
                     }
                 }
             }

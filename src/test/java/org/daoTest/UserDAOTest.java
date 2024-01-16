@@ -71,12 +71,13 @@ class UserDAOTest {
 
     @Test
     void testFindByUsername() {
-        String username = "testUsername";
+        User user = new User();
+        user.setUserName("testUsername");
         when(storage.getStorageMap()).thenReturn(getTestStorageMap());
 
-        String result = userDAO.findByUsername(username);
+        User result = userDAO.findByUsername(user.getUserName());
 
-        assertEquals(username, result);
+        assertEquals(user, result);
     }
 
     private Map<String, Map<Long, Object>> getTestStorageMap() {
