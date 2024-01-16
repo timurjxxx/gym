@@ -78,10 +78,8 @@ public class UserService {
         User existingUser = userDAO.get(userId);
 
         if (existingUser != null) {
-            existingUser.setId(userId);
-            existingUser.setFirstName(updatedUser.getFirstName());
-            existingUser.setLastName(updatedUser.getLastName());
-            return userDAO.save(existingUser);
+            updatedUser.setId(userId);
+            return userDAO.save(updatedUser);
         } else {
             throw new RuntimeException("User with ID " + userId + " not found");
         }
