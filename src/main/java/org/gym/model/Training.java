@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,6 +19,8 @@ public class Training {
     private String trainingName;
     private Date trainingDate;
     private Number trainingDuration;
+
+    private List<TrainingType> trainingType;
 
     @Override
     public String toString() {
