@@ -1,27 +1,24 @@
 package org.gym.service;
 
 import org.gym.dao.TrainerDAO;
+import org.gym.model.Trainee;
 import org.gym.model.Trainer;
+import org.gym.model.Training;
+import org.gym.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.IntStream;
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 
-@Component
+@Service
 public class TrainerService {
 
     private final TrainerDAO trainerDAO;
     private final UserService userService;
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrainerService.class);
-    private final AtomicLong idCounter = new AtomicLong(0);
-
 
     @Autowired
     public TrainerService(TrainerDAO trainerDAO, UserService userService) {
@@ -29,38 +26,24 @@ public class TrainerService {
         this.userService = userService;
     }
 
-    public Trainer createTrainer(Trainer newTrainer) {
-        newTrainer.setId(generateUniqueId());
-        newTrainer.setUserName(userService.generateUsername(newTrainer.getFirstName(), newTrainer.getLastName()));
-        newTrainer.setPassword(userService.generatePassword());
-        LOGGER.info("create new trainer ");
-        return trainerDAO.save(newTrainer);
+    public Trainer createTrainer(Trainer trainer) {
+        trainer.setPassword(userService.generatePassword());
+        trainer.setUserName(userService.generateUsername(trainer.getFirstName(), trainer.getLastName()));
+        return trainerDAO.save(trainer);
     }
 
-    private synchronized Long generateUniqueId() {
-        LOGGER.info("Generate unique Id for entity ");
-        return idCounter.incrementAndGet();
-
+    public Trainer selectTrainerByUserName(String username) {
+        return trainerDAO.findTrainerByUserName(username).orElseThrow(EntityNotFoundException::new);
     }
 
-
-    public Trainer selectTrainer(Long trainerId) {
-        return trainerDAO.get(trainerId);
+    public Trainer updateTrainer(String username, Trainer updatedTrainer) {
+        Trainer trainer = selectTrainerByUserName(username);
+        updatedTrainer.setId(trainer.getId());
+        return trainerDAO.save(updatedTrainer);
     }
-
-    public Trainer updateTrainer(Long trainerId, Trainer updatedTrainer) {
-        Trainer trainer = trainerDAO.get(trainerId);
-        LOGGER.info("Update trainer by Id");
-
-        if (trainer != null) {
-            updatedTrainer.setId(trainerId);
-            return trainerDAO.save(updatedTrainer);
-        } else throw new RuntimeException();
-
-    }
-
-    public Map<Long, Object> selectAllTrainers() {
-        return trainerDAO.getAll();
+    public List<Training> getTrainerTrainingList(String username) {
+        Trainer trainer = selectTrainerByUserName(username);
+        return trainer.getTraineeTrainings();
     }
 
 

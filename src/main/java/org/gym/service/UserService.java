@@ -6,20 +6,20 @@ import org.gym.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
-import java.util.Map;
+import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
-@Component
+@Service
 public class UserService {
-    private final UserDAO userDAO;
+    private UserDAO userDAO;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
-    private final AtomicLong idCounter = new AtomicLong(0);
 
     @Autowired
     public UserService(UserDAO userDAO) {
@@ -27,31 +27,28 @@ public class UserService {
     }
 
     public User selectUser(Long userId) {
-        return userDAO.get(userId);
+        return userDAO.findById(userId).orElseThrow(EntityNotFoundException::new);
     }
-
-    public User createtUser(User newUser) {
+    public User findUserByUserName(String username) {
+        return userDAO.findUserByUserName(username).orElseThrow(EntityNotFoundException::new);
+    }
+    public User createtUser(@Validated User newUser) {
         LOGGER.info("create new user");
-        newUser.setId(generateUniqueId());
-        newUser.setUserName(generateUsername(newUser.getFirstName(), newUser.getLastName()));
         newUser.setPassword(generatePassword());
+        newUser.setUserName(generateUsername(newUser.getFirstName(), newUser.getLastName()));
         return userDAO.save(newUser);
     }
-
-
     public String generateUsername(String firstName, String lastName) {
         String baseUsername = firstName + "." + lastName;
         LOGGER.info("Generate username");
 
         return IntStream.iterate(1, i -> i + 1)
                 .mapToObj(serialNumber -> baseUsername + ((serialNumber == 1) ? "" : "." + serialNumber))
-                .filter(username -> userDAO.findByUsername(username) == null)
+                .filter(username -> !userDAO.findUserByUserName(username).isPresent())
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
 
-
     }
-
 
     public String generatePassword() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -66,33 +63,56 @@ public class UserService {
         return sb.toString();
     }
 
-
-    public synchronized Long generateUniqueId() {
-        LOGGER.info("Generate unique id for entity ");
-        return idCounter.incrementAndGet();
-
-    }
-
     public User updateUser(Long userId, User updatedUser) {
         LOGGER.info("update user");
-        User existingUser = userDAO.get(userId);
+        User existingUser = userDAO.findById(userId).orElseThrow(EntityNotFoundException::new);
 
         if (existingUser != null) {
-            existingUser.setId(userId);
-            existingUser.setFirstName(updatedUser.getFirstName());
-            existingUser.setLastName(updatedUser.getLastName());
-            return userDAO.save(existingUser);
+            updatedUser.setId(userId);
+            return userDAO.save(updatedUser);
         } else {
             throw new RuntimeException("User with ID " + userId + " not found");
         }
     }
 
-
-    public void deletetUser(Long userId) {
-        userDAO.delete(userId);
+    public List<User> selectAllUsers() {
+        return userDAO.findAll();
     }
 
-    public Map<Long, Object> selectAllUsers() {
-        return userDAO.getAll();
+    public String changePassword(String username, String newPassword) {
+        User user = userDAO.findUserByUserName(username).orElseThrow(EntityNotFoundException::new);
+        if (user != null && authenticate(user.getUserName(), user.getPassword())) {
+            user.setPassword(newPassword);
+            userDAO.save(user);
+            return newPassword;
+        } else throw new EntityNotFoundException();
+    }
+
+    //
+    public boolean active(String username) {
+        User user = userDAO.findUserByUserName(username).orElseThrow(EntityNotFoundException::new);
+
+        if (!user.getIsActive()) {
+            user.setIsActive(true);
+            userDAO.save(user);
+            return user.getIsActive();
+        } else throw new EntityNotFoundException();
+    }
+
+    public boolean deActive(String username) {
+        User user = userDAO.findUserByUserName(username).orElseThrow(EntityNotFoundException::new);
+
+
+        if (user.getIsActive()) {
+            user.setIsActive(false);
+            userDAO.save(user);
+            return user.getIsActive();
+        } else throw new EntityNotFoundException();
+    }
+
+    public boolean authenticate(String username, String password) {
+        User user = userDAO.findUserByUserName(username).orElseThrow(EntityNotFoundException::new);
+
+        return user != null && user.getPassword().equals(password);
     }
 }

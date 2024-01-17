@@ -1,47 +1,31 @@
 package org.gym;
 
-
-import org.gym.dao.TraineeDAO;
-import org.gym.dao.TrainerDAO;
-import org.gym.dao.UserDAO;
-import org.gym.memory.InMemoryStorage;
-import org.gym.model.Trainee;
-import org.gym.model.Trainer;
+import org.gym.config.AppConfig;
+import org.gym.model.*;
 import org.gym.service.TraineeService;
 import org.gym.service.TrainerService;
+import org.gym.service.TrainingService;
 import org.gym.service.UserService;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-
-        InMemoryStorage inMemoryStorage = new InMemoryStorage();
-        UserDAO userDAO = new UserDAO(inMemoryStorage);
-        UserService userService = new UserService(userDAO);
-        TraineeDAO dao = new TraineeDAO(inMemoryStorage);
-        TraineeService traineeService = new TraineeService(dao,userService);
-        Trainee trainee = new Trainee();
-        trainee.setFirstName("Tim");
-        trainee.setLastName("Rj");
-        traineeService.createTrainee(trainee);
-        Trainee trainee1 = new Trainee();
-        trainee1.setFirstName("Tim");
-        trainee1.setLastName("Rj");
-        traineeService.createTrainee(trainee1);
-        TrainerDAO trainerDAO = new TrainerDAO(inMemoryStorage);
-        TrainerService trainerService = new TrainerService(trainerDAO,userService);
-        Trainer trainer = new Trainer();
-        trainer.setFirstName("Tom");
-        trainer.setLastName("Name");
-        trainerService.createTrainer(trainer);
-        Trainer trainer1 = new Trainer();
-        trainer1.setFirstName("Tom");
-        trainer1.setLastName("Name");
-        trainerService.createTrainer(trainer1);
-
-
-
-
-        System.out.println(inMemoryStorage.getStorageMap().toString());
-
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class)) {
+            UserService userService = context.getBean(UserService.class);
+            TrainerService trainerService = context.getBean(TrainerService.class);
+            TraineeService traineeService = context.getBean(TraineeService.class);
+            TrainingService trainingService = context.getBean(TrainingService.class);
+            Trainer trainer = new Trainer();
+            trainer.setFirstName("Trainer");
+            trainer.setLastName("T");
+            trainerService.createTrainer(trainer);
+            Trainee trainee = new Trainee();
+            trainee.setFirstName("Trainee");
+            trainee.setLastName("Tra");
+            traineeService.createTrainee(trainee);
+        }
     }
 }
