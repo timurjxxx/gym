@@ -31,7 +31,7 @@ public class TrainerService {
 
     public Trainer createTrainer(Trainer newTrainer) {
         newTrainer.setId(generateUniqueId());
-        newTrainer.setUserName(userService.generateUsername(newTrainer.getFirstName(), newTrainer.getLastName()));
+        newTrainer.setUserName(userService.generateUsername(newTrainer.getFirstName() + "." + newTrainer.getLastName()));
         newTrainer.setPassword(userService.generatePassword());
         LOGGER.info("create new trainer ");
         return trainerDAO.save(newTrainer);

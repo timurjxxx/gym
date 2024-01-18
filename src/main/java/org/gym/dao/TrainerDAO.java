@@ -35,22 +35,7 @@ public class TrainerDAO {
 
 
 
-    public String findByUsername(String username) {
-        LOGGER.info("Find trainer by uer name");
 
-        for (Map<Long, Object> innerMap : storage.getStorageMap().values()) {
-            for (Object obj : innerMap.values()) {
-                if (obj instanceof Trainer) {
-                    Trainer trainer = (Trainer) obj;
-                    String trainerUsername = trainer.getUserName();
-                    if (trainerUsername != null && trainerUsername.equals(username)) {
-                        return username = trainerUsername;
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
 
 }

@@ -35,7 +35,7 @@ public class TraineeService {
     public Trainee createTrainee(Trainee newTrainee) {
 
         newTrainee.setId(generateUniqueId());
-        newTrainee.setUserName(userService.generateUsername(newTrainee.getFirstName(), newTrainee.getLastName()));
+        newTrainee.setUserName(userService.generateUsername(newTrainee.getFirstName() + "." + newTrainee.getLastName()));
         newTrainee.setPassword(userService.generatePassword());
         LOGGER.info("Create new trainee ");
         return traineeDAO.save(newTrainee);

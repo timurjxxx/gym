@@ -61,15 +61,7 @@ class TrainerDAOTest {
         verify(storage, times(1)).getAll("Trainer");
     }
 
-    @Test
-    void testFindByUsername() {
-        String username = "testUsername";
-        when(storage.getStorageMap()).thenReturn(getTestStorageMap());
 
-        String result = trainerDAO.findByUsername(username);
-
-        assertEquals(username, result);
-    }
 
     private Map<String, Map<Long, Object>> getTestStorageMap() {
         Map<String, Map<Long, Object>> storageMap = new HashMap<>();

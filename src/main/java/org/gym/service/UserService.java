@@ -33,18 +33,17 @@ public class UserService {
     public User createtUser(User newUser) {
         LOGGER.info("create new user");
         newUser.setId(generateUniqueId());
-        newUser.setUserName(generateUsername(newUser.getFirstName(), newUser.getLastName()));
+        newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
         newUser.setPassword(generatePassword());
         return userDAO.save(newUser);
     }
 
 
-    public String generateUsername(String firstName, String lastName) {
-        String baseUsername = firstName + "." + lastName;
+    public String generateUsername(String username1) {
         LOGGER.info("Generate username");
 
         return IntStream.iterate(1, i -> i + 1)
-                .mapToObj(serialNumber -> baseUsername + ((serialNumber == 1) ? "" : "." + serialNumber))
+                .mapToObj(serialNumber -> username1 + ((serialNumber == 1) ? "" : "." + serialNumber))
                 .filter(username -> userDAO.findByUsername(username) == null)
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
