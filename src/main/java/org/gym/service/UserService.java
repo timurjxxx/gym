@@ -30,14 +30,13 @@ public class UserService {
         return userDAO.get(userId);
     }
 
-    public User createtUser(User newUser) {
+    public User createUser(User newUser) {
         LOGGER.info("create new user");
         newUser.setId(generateUniqueId());
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
         newUser.setPassword(generatePassword());
         return userDAO.save(newUser);
     }
-
 
     public String generateUsername(String username1) {
         LOGGER.info("Generate username");
@@ -47,8 +46,6 @@ public class UserService {
                 .filter(username -> userDAO.findByUsername(username) == null)
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
-
-
     }
 
 

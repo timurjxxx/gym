@@ -18,7 +18,6 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class UserServiceTest {
@@ -56,7 +55,7 @@ class UserServiceTest {
             return savedUser;
         });
 
-        User result = userService.createtUser(newUser);
+        User result = userService.createUser(newUser);
 
         assertNotNull(result);
         assertNotNull(result.getId());
@@ -98,4 +97,7 @@ class UserServiceTest {
         assertNotNull(result);
         verify(userDAO, times(1)).getAll();
     }
+
+
+
 }
