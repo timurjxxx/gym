@@ -1,6 +1,5 @@
 package org.storageTest;
 
-
 import org.gym.memory.InMemoryStorage;
 import org.gym.memory.StorageInitialization;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,10 +12,14 @@ import org.springframework.core.io.ResourceLoader;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.mockito.Mockito.*;
 
 class StorageInitializationTest {
+
+    @InjectMocks
+    private StorageInitialization storageInitialization;
 
     @Mock
     private ResourceLoader resourceLoader;
@@ -27,26 +30,36 @@ class StorageInitializationTest {
     @Mock
     private Resource resource;
 
-    @InjectMocks
-    private StorageInitialization storageInitialization;
+    @Mock
+    private InputStream inputStream;
 
     @BeforeEach
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testInitializeStorageWithData() throws IOException {
-        String filePath = "dummyFilePath";
-        File dummyFile = mock(File.class);
+    public void testInitializeStorageWithData() throws IOException {
+        // Arrange
+        String filePath = "test_data.txt";
 
         when(resourceLoader.getResource("classpath:application.properties")).thenReturn(resource);
-        when(resource.getFile()).thenReturn(dummyFile);
-        when(dummyFile.getPath()).thenReturn(filePath);
+        when(resource.getFile()).thenReturn(new File(filePath));  // Use File to represent an actual file
+        when(resource.getInputStream()).thenReturn(inputStream);
+
+        // Act
+        storageInitialization.initializeStorageWithData();
+
+        // Assert
+        verify(inMemoryStorage).initializeWithDataFromFile(filePath);
+    }
+
+    @Test
+    public void testInitializeStorageWithDataIOException() throws IOException {
+        when(resourceLoader.getResource("classpath:application.properties")).thenReturn(resource);
+        when(resource.getFile()).thenThrow(new IOException("Mocked IOException"));
 
         storageInitialization.initializeStorageWithData();
 
-        verify(resourceLoader).getResource("classpath:application.properties");
-        verify(inMemoryStorage).initializeWithDataFromFile(filePath);
     }
 }

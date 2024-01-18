@@ -72,7 +72,7 @@ public class InMemoryStorage {
         }
     }
 
-    private Object parseValue(String namespace) {
+    public Object parseValue(String namespace) {
         return namespace;
     }
 }
