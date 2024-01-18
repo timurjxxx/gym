@@ -1,7 +1,9 @@
 package org.gym.config;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -18,15 +20,38 @@ import java.util.Properties;
 @ComponentScan(basePackages = "org.gym")
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "org.gym.dao")
+@PropertySource(value = "classpath:application.properties")
 public class AppConfig {
 
+    @Value("${spring.datasource.url}")
+    private String url;
+
+    @Value("${spring.datasource.driverClassName}")
+    private String className;
+
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+
+    @Value("${spring.datasource.password}")
+    private String password;
+
+    @Value("${hibernate.dialect}")
+    private String hibernateDialect;
+
+    @Value("${hibernate.show_sql}")
+    private String show_sql;
+
+    @Value("${hibernate.hbm2ddl.auto}")
+    private String auto_sql;
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/postgres");
-        dataSource.setUsername("postgres");
-        dataSource.setPassword("gamer120");
+        dataSource.setDriverClassName(className);
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
         return dataSource;
     }
 
@@ -47,9 +72,9 @@ public class AppConfig {
 
     private Properties hibernateProperties() {
         Properties properties = new Properties();
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-        properties.setProperty("hibernate.show_sql", "true");
-        properties.setProperty("hibernate.hbm2ddl.auto", "create");
+        properties.setProperty("hibernate.dialect",  hibernateDialect);
+        properties.setProperty("hibernate.show_sql", show_sql);
+        properties.setProperty("hibernate.hbm2ddl.auto", auto_sql);
 
         return properties;
     }

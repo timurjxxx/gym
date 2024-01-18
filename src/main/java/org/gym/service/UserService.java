@@ -88,7 +88,7 @@ public class UserService {
         } else throw new EntityNotFoundException();
     }
 
-    //
+
     public boolean active(String username) {
         User user = userDAO.findUserByUserName(username).orElseThrow(EntityNotFoundException::new);
 
