@@ -40,17 +40,14 @@ class StorageInitializationTest {
 
     @Test
     public void testInitializeStorageWithData() throws IOException {
-        // Arrange
         String filePath = "test_data.txt";
 
         when(resourceLoader.getResource("classpath:application.properties")).thenReturn(resource);
-        when(resource.getFile()).thenReturn(new File(filePath));  // Use File to represent an actual file
+        when(resource.getFile()).thenReturn(new File(filePath));
         when(resource.getInputStream()).thenReturn(inputStream);
 
-        // Act
         storageInitialization.initializeStorageWithData();
 
-        // Assert
         verify(inMemoryStorage).initializeWithDataFromFile(filePath);
     }
 
