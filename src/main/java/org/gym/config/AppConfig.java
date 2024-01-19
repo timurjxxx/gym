@@ -23,5 +23,13 @@ public class AppConfig {
         return filePath;
     }
 
+    @Value("${password.length}")
+    private int passwordLength;
+
+    @Bean
+    public int getPasswordLength() {
+        return passwordLength;
+    }
+
 
 }

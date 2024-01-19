@@ -82,7 +82,7 @@ class InMemoryStorageTest {
 
     @Test
     void initializeWithDataFromFile() throws IOException {
-        String fileContent = "namespace1,1,value1\nnamespace2,2,value2";
+        String fileContent = "Trainer,2,John Black\nTrainee,2,Bob  White";
         BufferedReader bufferedReader = new BufferedReader(new StringReader(fileContent));
 
         when(resourceLoader.getResource(anyString())).thenReturn(resource);
@@ -91,8 +91,8 @@ class InMemoryStorageTest {
 
         inMemoryStorage.initializeWithDataFromFile("D://test.txt");
 
-        verify(inMemoryStorage, times(1)).save(eq("namespace1"), eq(1L), eq("value1"));
-        verify(inMemoryStorage, times(1)).save(eq("namespace2"), eq(2L), eq("value2"));
+        verify(inMemoryStorage, times(1)).save(eq("Trainer"), eq(2L), eq("John Black"));
+        verify(inMemoryStorage, times(1)).save(eq("Trainee"), eq(2L), eq("Bob  White"));
     }
 
     @Test

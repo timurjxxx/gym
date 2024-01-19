@@ -10,13 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 
-
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
@@ -98,6 +99,58 @@ class UserServiceTest {
         verify(userDAO, times(1)).getAll();
     }
 
+    @Test
+    public void testGenerateUsername() {
+        // Arrange
+        String firstName = "John";
+        String lastName = "Doe";
+        String username1 = firstName + "." + lastName;
+
+        when(userDAO.findByUsername(username1)).thenReturn(null);
+
+        String generatedUsername = userService.generateUsername(username1);
+
+        assertEquals(username1, generatedUsername);
+
+        verify(userDAO, times(1)).findByUsername(username1);
+    }
 
 
+    @Test
+    public void testGenerateUsernameWithExistingUsername() {
+        // Arrange
+        String firstName = "John";
+        String lastName = "Doe";
+        String username1 = firstName + "." + lastName;
+
+        when(userDAO.findByUsername(username1)).thenReturn(new User());
+
+        String generatedUsername = userService.generateUsername(username1);
+
+        assertEquals(username1 + ".2", generatedUsername);
+
+        verify(userDAO, times(1)).findByUsername(username1);
+        verify(userDAO, times(1)).findByUsername(username1 + ".2");
+    }
+
+    @Test
+    public void testGeneratePassword() {
+        // Arrange
+        Set<String> generatedPasswords = new HashSet<>();
+
+        // Act & Assert
+        for (int i = 0; i < 1000; i++) {
+            String generatedPassword = userService.generatePassword();
+
+            assertNotNull(generatedPassword);
+            assertFalse(generatedPassword.isEmpty());
+
+            assertFalse(generatedPasswords.contains(generatedPassword));
+            generatedPasswords.add(generatedPassword);
+
+            assertEquals(10, generatedPassword.length());
+
+            assertTrue(generatedPassword.matches("[a-zA-Z0-9]+"));
+        }
+    }
 }

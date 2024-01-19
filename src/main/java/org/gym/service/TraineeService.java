@@ -33,6 +33,7 @@ public class TraineeService {
     }
 
     public Trainee createTrainee(Trainee newTrainee) {
+        LOGGER.debug("");
 
         newTrainee.setId(generateUniqueId());
         newTrainee.setUserName(userService.generateUsername(newTrainee.getFirstName() + "." + newTrainee.getLastName()));
@@ -54,6 +55,8 @@ public class TraineeService {
     public Trainee updateTrainee(Long traineeId, Trainee newTrainee) {
         Trainee trainee = traineeDAO.get(traineeId);
         LOGGER.info("Update trainee  ");
+        LOGGER.debug("");
+
 
         if (trainee != null) {
             newTrainee.setId(traineeId);

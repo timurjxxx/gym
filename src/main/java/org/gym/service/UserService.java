@@ -6,6 +6,7 @@ import org.gym.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -21,6 +22,7 @@ public class UserService {
 
     private final AtomicLong idCounter = new AtomicLong(0);
 
+
     @Autowired
     public UserService(UserDAO userDAO) {
         this.userDAO = userDAO;
@@ -32,6 +34,8 @@ public class UserService {
 
     public User createUser(User newUser) {
         LOGGER.info("create new user");
+        LOGGER.debug("");
+
         newUser.setId(generateUniqueId());
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
         newUser.setPassword(generatePassword());
@@ -40,6 +44,8 @@ public class UserService {
 
     public String generateUsername(String username1) {
         LOGGER.info("Generate username");
+        LOGGER.debug("");
+
 
         return IntStream.iterate(1, i -> i + 1)
                 .mapToObj(serialNumber -> username1 + ((serialNumber == 1) ? "" : "." + serialNumber))
@@ -58,6 +64,8 @@ public class UserService {
             sb.append(chars.charAt(index));
         }
         LOGGER.info("Generate unique password");
+        LOGGER.debug("");
+
 
         return sb.toString();
     }
@@ -65,12 +73,15 @@ public class UserService {
 
     public synchronized Long generateUniqueId() {
         LOGGER.info("Generate unique id for entity ");
+        LOGGER.debug("");
         return idCounter.incrementAndGet();
 
     }
 
     public User updateUser(Long userId, User updatedUser) {
         LOGGER.info("update user");
+        LOGGER.debug("");
+
         User existingUser = userDAO.get(userId);
 
         if (existingUser != null) {

@@ -21,12 +21,16 @@ public class TrainingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainingService.class);
     @Autowired
     public TrainingService(TrainingDAO trainingDAO, TrainerService trainerService, TraineeService traineeService) {
+        LOGGER.debug("");
+
         this.trainingDAO = trainingDAO;
         this.trainerService = trainerService;
         this.traineeService = traineeService;
     }
 
     public Training createTraining(Training training, Long trainerId, Long traineeId) {
+        LOGGER.debug("");
+
         training.setId(generateUniqueId());
         training.setTraineeId(traineeService.selectTrainee(traineeId));
         training.setTrainerId(trainerService.selectTrainer(trainerId));
@@ -36,6 +40,8 @@ public class TrainingService {
     }
 
     public Training createTraining(Training training, Trainee trainee, Trainer trainer) {
+        LOGGER.debug("");
+
         training.setId(generateUniqueId());
         training.setTraineeId(traineeService.createTrainee(trainee));
         training.setTrainerId(trainerService.createTrainer(trainer));

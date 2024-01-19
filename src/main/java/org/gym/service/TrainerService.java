@@ -30,6 +30,8 @@ public class TrainerService {
     }
 
     public Trainer createTrainer(Trainer newTrainer) {
+        LOGGER.debug("");
+
         newTrainer.setId(generateUniqueId());
         newTrainer.setUserName(userService.generateUsername(newTrainer.getFirstName() + "." + newTrainer.getLastName()));
         newTrainer.setPassword(userService.generatePassword());
@@ -49,6 +51,8 @@ public class TrainerService {
     }
 
     public Trainer updateTrainer(Long trainerId, Trainer updatedTrainer) {
+        LOGGER.debug("");
+
         Trainer trainer = trainerDAO.get(trainerId);
         LOGGER.info("Update trainer by Id");
 
