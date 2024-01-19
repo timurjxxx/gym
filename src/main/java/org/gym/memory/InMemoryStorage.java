@@ -25,35 +25,38 @@ public class InMemoryStorage {
     private Map<String, Map<Long, Object>> storageMap = new HashMap<>();
 
     public Object save(String namespace, Long key, Object entity) {
+        LOGGER.info("Saving entity by namespace into memory");
+        LOGGER.debug("Namespace: {}, Key: {}, Entity: {}", namespace, key, entity);
 
-        LOGGER.info("Save entity by namespace into memory");
         return storageMap.computeIfAbsent(namespace, k -> new HashMap<>()).put(key, entity);
     }
 
     public Object get(String namespace, Long key) {
-        LOGGER.info("Find entity by id ");
+        LOGGER.info("Finding entity by ID");
+        LOGGER.debug("Namespace: {}, Key: {}", namespace, key);
 
         return storageMap.getOrDefault(namespace, new HashMap<>()).get(key);
     }
 
     public Map<Long, Object> getAll(String namespace) {
+        LOGGER.info("Getting all entities by namespace");
+        LOGGER.debug("Namespace: {}", namespace);
 
         return storageMap.getOrDefault(namespace, new HashMap<>());
     }
 
     public void delete(String namespace, Long key) {
-        LOGGER.info("Delete entity by id ");
+        LOGGER.info("Deleting entity by ID");
+        LOGGER.debug("Namespace: {}, Key: {}", namespace, key);
 
         if (storageMap.containsKey(namespace)) {
             storageMap.get(namespace).remove(key);
         }
     }
 
-
-
-
     public void initializeWithDataFromFile(String filePath) {
-        LOGGER.info("Parsing data from file and save into memory ");
+        LOGGER.info("Parsing data from file and saving into memory");
+        LOGGER.debug("File Path: {}", filePath);
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -67,12 +70,12 @@ public class InMemoryStorage {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
-
+            LOGGER.error("Error while parsing data from file", e);
         }
     }
 
-    public Object parseValue(String namespace) {
-        return namespace;
+    public Object parseValue(String value) {
+        LOGGER.debug("Parsing value: {}", value);
+        return value;
     }
 }

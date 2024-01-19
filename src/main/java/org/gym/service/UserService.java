@@ -34,18 +34,18 @@ public class UserService {
 
     public User createUser(User newUser) {
         LOGGER.info("create new user");
-        LOGGER.debug("");
+        LOGGER.debug("New user details: {}", newUser);
 
         newUser.setId(generateUniqueId());
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
         newUser.setPassword(generatePassword());
+        LOGGER.debug("User created: {}", newUser);
         return userDAO.save(newUser);
     }
 
     public String generateUsername(String username1) {
         LOGGER.info("Generate username");
-        LOGGER.debug("");
-
+        LOGGER.debug("Base username: {}", username1);
 
         return IntStream.iterate(1, i -> i + 1)
                 .mapToObj(serialNumber -> username1 + ((serialNumber == 1) ? "" : "." + serialNumber))
@@ -64,7 +64,7 @@ public class UserService {
             sb.append(chars.charAt(index));
         }
         LOGGER.info("Generate unique password");
-        LOGGER.debug("");
+        LOGGER.debug("Generated password: {}", sb.toString());
 
 
         return sb.toString();
@@ -73,14 +73,13 @@ public class UserService {
 
     public synchronized Long generateUniqueId() {
         LOGGER.info("Generate unique id for entity ");
-        LOGGER.debug("");
         return idCounter.incrementAndGet();
 
     }
 
     public User updateUser(Long userId, User updatedUser) {
         LOGGER.info("update user");
-        LOGGER.debug("");
+        LOGGER.debug("Updated user details: {}", updatedUser);
 
         User existingUser = userDAO.get(userId);
 
@@ -88,6 +87,7 @@ public class UserService {
             updatedUser.setId(userId);
             return userDAO.save(updatedUser);
         } else {
+            LOGGER.warn("User with ID {} not found", userId);
             throw new RuntimeException("User with ID " + userId + " not found");
         }
     }

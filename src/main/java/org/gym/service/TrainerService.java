@@ -22,7 +22,6 @@ public class TrainerService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainerService.class);
     private final AtomicLong idCounter = new AtomicLong(0);
 
-
     @Autowired
     public TrainerService(TrainerDAO trainerDAO, UserService userService) {
         this.trainerDAO = trainerDAO;
@@ -30,42 +29,48 @@ public class TrainerService {
     }
 
     public Trainer createTrainer(Trainer newTrainer) {
-        LOGGER.debug("");
+        LOGGER.debug("Creating new trainer");
+        LOGGER.debug("New trainer details: {}", newTrainer);
 
         newTrainer.setId(generateUniqueId());
         newTrainer.setUserName(userService.generateUsername(newTrainer.getFirstName() + "." + newTrainer.getLastName()));
         newTrainer.setPassword(userService.generatePassword());
-        LOGGER.info("create new trainer ");
-        return trainerDAO.save(newTrainer);
+
+        Trainer savedTrainer = trainerDAO.save(newTrainer);
+        LOGGER.info("Trainer created: {}", savedTrainer);
+
+        return savedTrainer;
     }
 
     private synchronized Long generateUniqueId() {
-        LOGGER.info("Generate unique Id for entity ");
+        LOGGER.info("Generating unique ID for trainer");
         return idCounter.incrementAndGet();
-
     }
 
-
     public Trainer selectTrainer(Long trainerId) {
+        LOGGER.debug("Selecting trainer by ID: {}", trainerId);
         return trainerDAO.get(trainerId);
     }
 
     public Trainer updateTrainer(Long trainerId, Trainer updatedTrainer) {
-        LOGGER.debug("");
+        LOGGER.debug("Updating trainer by ID: {}", trainerId);
+        LOGGER.debug("Updated trainer details: {}", updatedTrainer);
 
         Trainer trainer = trainerDAO.get(trainerId);
-        LOGGER.info("Update trainer by Id");
 
         if (trainer != null) {
             updatedTrainer.setId(trainerId);
-            return trainerDAO.save(updatedTrainer);
-        } else throw new RuntimeException();
-
+            Trainer savedTrainer = trainerDAO.save(updatedTrainer);
+            LOGGER.info("Trainer updated: {}", savedTrainer);
+            return savedTrainer;
+        } else {
+            LOGGER.warn("Trainer with ID {} not found", trainerId);
+            throw new RuntimeException();
+        }
     }
 
     public Map<Long, Object> selectAllTrainers() {
+        LOGGER.debug("Selecting all trainers");
         return trainerDAO.getAll();
     }
-
-
 }

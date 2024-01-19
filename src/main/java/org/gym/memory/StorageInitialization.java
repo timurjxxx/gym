@@ -17,6 +17,8 @@ public class StorageInitialization {
     private final InMemoryStorage inMemoryStorage;
     private final String filePath;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StorageInitialization.class);
+
     @Autowired
     public StorageInitialization(InMemoryStorage inMemoryStorage, String filePath) {
         this.inMemoryStorage = inMemoryStorage;
@@ -25,6 +27,9 @@ public class StorageInitialization {
 
     @PostConstruct
     public void initializeStorageWithData() {
+        LOGGER.info("Initializing storage with data");
+        LOGGER.debug("File Path: {}", filePath);
+
         inMemoryStorage.initializeWithDataFromFile(filePath);
     }
 }
