@@ -24,18 +24,18 @@ import java.util.Properties;
 public class AppConfig {
 
     @Value("${spring.datasource.url}")
-    private String url;
+    public String url;
 
     @Value("${spring.datasource.driverClassName}")
-    private String className;
+    public String className;
 
 
     @Value("${spring.datasource.username}")
-    private String username;
+    public String username;
 
 
     @Value("${spring.datasource.password}")
-    private String password;
+    public String password;
 
     @Value("${hibernate.dialect}")
     private String hibernateDialect;
@@ -70,7 +70,7 @@ public class AppConfig {
         return new JpaTransactionManager(entityManagerFactory);
     }
 
-    private Properties hibernateProperties() {
+    public Properties hibernateProperties() {
         Properties properties = new Properties();
         properties.setProperty("hibernate.dialect",  hibernateDialect);
         properties.setProperty("hibernate.show_sql", show_sql);

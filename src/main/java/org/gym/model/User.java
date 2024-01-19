@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user_entity")
@@ -22,18 +23,24 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "First name cannot be blank")
     @Column(nullable = false)
     private String firstName;
-    @NotBlank
+    @NotBlank(message = "Last name cannot be blank")
     @Column(nullable = false)
     private String lastName;
-
+    @Column(nullable = false)
     private String userName;
 
     private String password;
 
     private Boolean isActive;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Trainer trainer;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Trainee trainee;
 
     @Override
     public String toString() {

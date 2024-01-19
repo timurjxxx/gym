@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -15,10 +18,25 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Trainee   extends User {
+public class Trainee {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull(message = "Date of birth cannot be null")
+    @Past(message = "Date of birth must be in the past")
+    @Column(nullable = false)
     private Date dateOfBirth;
+
+    @NotBlank(message = "Address cannot be blank")
+    @Column(nullable = false)
     private String address;
+
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToMany
     @JoinTable(
@@ -28,14 +46,9 @@ public class Trainee   extends User {
     )
     private Set<Trainer> trainers = new HashSet<>();
 
+
     @OneToMany(mappedBy = "trainee", cascade = CascadeType.REMOVE)
     private List<Training> traineeTrainings;
 
-    @Override
-    public String toString() {
-        return super.toString()+ "Trainee{" +
-                "dateOfBirth=" + dateOfBirth +
-                ", address='" + address + '\'' +
-                '}';
-    }
+
 }

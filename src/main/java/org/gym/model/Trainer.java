@@ -7,19 +7,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "trainer_entity")
 @NoArgsConstructor
 @Data
 @AllArgsConstructor
-public class Trainer extends User {
-
+public class Trainer   {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @NotBlank(message = "Specialization cannot be blank")
+    @Column(nullable = false)
     private String specialization;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToMany(mappedBy = "trainers")
     private Set<Trainee> trainees = new HashSet<>();
@@ -29,8 +37,10 @@ public class Trainer extends User {
 
     @Override
     public String toString() {
-        return super.toString() + "Trainer{" +
-                "specialization='" + specialization + '\'' +
+        return "Trainer{" +
+                "id=" + id +
+                ", specialization='" + specialization + '\'' +
+                ", user=" + user +
                 '}';
     }
 }
