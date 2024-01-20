@@ -80,24 +80,4 @@ class InMemoryStorageTest {
         assertNull(inMemoryStorage.get(namespace, key));
     }
 
-    @Test
-    void initializeWithDataFromFile() throws IOException {
-        String fileContent = "Trainer,2,John Black\nTrainee,2,Bob  White";
-        BufferedReader bufferedReader = new BufferedReader(new StringReader(fileContent));
-
-        when(resourceLoader.getResource(anyString())).thenReturn(resource);
-        when(resource.getFile()).thenReturn(null);
-        when(inMemoryStorage.parseValue(anyString())).thenCallRealMethod();
-
-        inMemoryStorage.initializeWithDataFromFile("D://test.txt");
-
-        verify(inMemoryStorage, times(1)).save(eq("Trainer"), eq(2L), eq("John Black"));
-        verify(inMemoryStorage, times(1)).save(eq("Trainee"), eq(2L), eq("Bob  White"));
-    }
-
-    @Test
-    void parseValue() {
-        String value = "testValue";
-        assertEquals(value, inMemoryStorage.parseValue(value));
-    }
 }

@@ -10,7 +10,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 
 @Configuration
-@ComponentScan
+@ComponentScan(basePackages = "org.gym")
 @PropertySource("classpath:application.properties")
 
 public class AppConfig {

@@ -1,5 +1,7 @@
 package org.gym.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.stereotype.Component;
@@ -18,10 +20,13 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Trainee extends User {
-
+    @JsonProperty("dateOfBirth")
     private Date dateOfBirth;
+    @JsonProperty("address")
     private String address;
+
 
     public Trainee(Long id, String firstName, String lastName, String userName, String password, Boolean isActive, Date dateOfBirth, String address) {
         super(id, firstName, lastName, userName, password, isActive);
