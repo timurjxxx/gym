@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 
 @Service
 public class TrainingService {
@@ -20,7 +23,7 @@ public class TrainingService {
         this.trainingDAO = trainingDAO;
     }
     @Transactional
-    public Training addTraining(Training training) {
+    public Training addTraining(@Valid Training training) {
         return trainingDAO.save(training);
     }
 

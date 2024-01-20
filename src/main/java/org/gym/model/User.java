@@ -29,7 +29,6 @@ public class User {
     @NotBlank(message = "Last name cannot be blank")
     @Column(nullable = false)
     private String lastName;
-    @Column(nullable = false)
     private String userName;
 
     private String password;

@@ -1,6 +1,7 @@
 package org.gym.service;
 
 import lombok.AllArgsConstructor;
+import org.gym.aspect.Authenticated;
 import org.gym.dao.TraineeDAO;
 import org.gym.model.Trainee;
 import org.gym.model.Trainer;
@@ -32,6 +33,7 @@ public class TraineeService {
         this.traineeDAO = traineeDAO;
         this.userService = userService;
     }
+
     @Transactional
     public Trainee createTrainee(@Valid Trainee trainee, @NotNull Long userId) {
         LOGGER.info("Creating trainee with user ID: {}", userId);
@@ -39,74 +41,70 @@ public class TraineeService {
         trainee.setUser(userService.findUserById(userId));
         return traineeDAO.save(trainee);
     }
-    @Transactional
-    public Trainee createTrainee(@Valid Trainee trainee, @Valid User user) {
-        LOGGER.info("Creating trainee with user details: {}", user);
-        LOGGER.debug("Trainee details: {}", trainee);
-        trainee.setUser(userService.createUser(user));
-        return traineeDAO.save(trainee);
 
-    }
+    @Authenticated
     @Transactional(readOnly = true)
-    public Trainee selectTraineeByUsername(@NotBlank String username) {
+    public Trainee selectTraineeByUsername(@NotBlank String username, @NotBlank String password) {
         LOGGER.info("Selecting trainee by username: {}", username);
         return traineeDAO.findTraineeByUserUserName(username).orElseThrow(EntityNotFoundException::new);
-
     }
+
+    @Authenticated
     @Transactional
-    public Trainee updateTrainee(@NotBlank String username, @Valid Trainee updatedTrainee) {
+    public Trainee updateTrainee(@NotBlank String username, @NotBlank String password, @Valid Trainee updatedTrainee) {
         LOGGER.info("Updating trainee with username: {}", username);
         LOGGER.debug("Updated trainee details: {}", updatedTrainee);
-        Trainee trainee = selectTraineeByUsername(username);
+        Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(EntityNotFoundException::new);
         updatedTrainee.setId(trainee.getId());
         return traineeDAO.save(updatedTrainee);
     }
 
+    @Authenticated
     @Transactional
-    public void deleteTraineeByUserName(@NotBlank String username) {
+    public void deleteTraineeByUserName(@NotBlank String username, @NotBlank String password) {
         LOGGER.info("Deleting trainee by username: {}", username);
 
-        Trainee trainee = selectTraineeByUsername(username);
+        Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(EntityNotFoundException::new);
         traineeDAO.deleteById(trainee.getId());
     }
+    @Authenticated
+
     @Transactional(readOnly = true)
-    public List<Training> getTraineeTrainingList(@NotBlank String username) {
+    public List<Training> getTraineeTrainingList(@NotBlank String username, @NotBlank String password) {
         LOGGER.info("Getting training list for trainee with username: {}", username);
 
-        Trainee trainee = selectTraineeByUsername(username);
+        Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(EntityNotFoundException::new);
         return trainee.getTraineeTrainings();
     }
+    @Authenticated
     @Transactional
-    public List<Training> updateTraineeTrainingList(@NotBlank String username, @Valid List<Training> updatedList) {
+    public List<Training> updateTraineeTrainingList(@NotBlank String username,@NotBlank String password, @Valid List<Training> updatedList) {
         LOGGER.info("Updating training list for trainee with username: {}", username);
 
-        Trainee trainee = selectTraineeByUsername(username);
+        Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(EntityNotFoundException::new);
         trainee.setTraineeTrainings(updatedList);
         traineeDAO.save(trainee);
         return trainee.getTraineeTrainings();
 
     }
+    @Authenticated
 
-    public String changePassword(@NotBlank String username, @NotBlank String newPassword) {
+    public String changePassword(@NotBlank String username,String password, @NotBlank String newPassword) {
         LOGGER.info("Activating trainee with username: {}", username);
 
-        Trainee trainee = selectTraineeByUsername(username);
+        Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(EntityNotFoundException::new);
         trainee.getUser().setPassword(userService.changePassword(username, newPassword));
         return trainee.getUser().getPassword();
     }
 
-    public String activeTrainee(@NotBlank String username) {
+    @Authenticated
+    public String changeStatus(@NotBlank String username, String password) {
         LOGGER.info("Activating trainee with username: {}", username);
 
-        Trainee trainee = selectTraineeByUsername(username);
-        trainee.getUser().setIsActive(userService.active(username));
+        Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(EntityNotFoundException::new);
+        trainee.getUser().setIsActive(userService.changeStatus(username));
         return "Activated";
     }
 
-    public String deActiveTrainee(@NotBlank String username) {
-        LOGGER.info("Deactivating trainee with username: {}", username);
-        Trainee trainee = selectTraineeByUsername(username);
-        trainee.getUser().setIsActive(userService.deActive(username));
-        return "deActivated";
-    }
+
 }

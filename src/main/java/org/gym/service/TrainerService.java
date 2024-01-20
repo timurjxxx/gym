@@ -1,5 +1,6 @@
 package org.gym.service;
 
+import org.gym.aspect.Authenticated;
 import org.gym.dao.TrainerDAO;
 import org.gym.model.Trainee;
 import org.gym.model.Trainer;
@@ -32,6 +33,7 @@ public class TrainerService {
         this.trainerDAO = trainerDAO;
         this.userService = userService;
     }
+
     @Transactional
     public Trainer createTrainer(@Valid Trainer trainer, @NotNull Long userId) {
         LOGGER.info("Creating trainer with user ID: {}", userId);
@@ -39,70 +41,57 @@ public class TrainerService {
         trainer.setUser(userService.findUserById(userId));
         return trainerDAO.save(trainer);
     }
-    @Transactional
-    public Trainer createTrainer(@Valid Trainer trainer,@Valid User user) {
-        LOGGER.info("Creating trainer with user details: {}", user);
-        LOGGER.debug("Trainer details: {}", trainer);
-        trainer.setUser(userService.createUser(user));
-        return trainerDAO.save(trainer);
 
-    }
+    @Authenticated
     @Transactional(readOnly = true)
-    public Trainer selectTrainerByUserName(@NotBlank String username) {
+    public Trainer selectTrainerByUserName(String username, String password) {
         LOGGER.info("Selecting trainer by username: {}", username);
 
-        Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
-        if (userService.authenticate(trainer.getUser().getUserName(), trainer.getUser().getPassword())) {
-            return trainer;
-
-        } else {
-            LOGGER.warn("Authentication failed for trainer with username: {}", username);
-
-            throw new RuntimeException();
-        }
+        LOGGER.warn("Authentication failed for trainer with username: {}", username);
+        return trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
 
 
     }
 
-
+    @Authenticated
     @Transactional
-    public Trainer updateTrainer(@NotBlank String username, @Valid Trainer updatedTrainer) {
+    public Trainer updateTrainer(@NotBlank String username, @NotBlank String password, @Valid Trainer updatedTrainer) {
         LOGGER.info("Updating trainer with username: {}", username);
         LOGGER.debug("Updated trainer details: {}", updatedTrainer);
-        Trainer trainer = selectTrainerByUserName(username);
+        Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
 
         updatedTrainer.setId(trainer.getId());
         return trainerDAO.save(updatedTrainer);
     }
+
+    @Authenticated
     @Transactional(readOnly = true)
-    public List<Training> getTrainerTrainingList(@NotBlank String username) {
+    public List<Training> getTrainerTrainingList(@NotBlank String username, @NotBlank String password) {
         LOGGER.info("Getting training list for trainer with username: {}", username);
 
-        Trainer trainer = selectTrainerByUserName(username);
+        Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
         return trainer.getTraineeTrainings();
     }
 
-    public String changePassword( @NotBlank String username, @NotBlank String newPassword) {
+
+    @Authenticated
+    public String changePassword(@NotBlank String username, @NotBlank String password, @NotBlank String newPassword) {
         LOGGER.info("Changing password for trainer with username: {}", username);
 
-        Trainer trainer = selectTrainerByUserName(username);
+        Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
         trainer.getUser().setPassword(userService.changePassword(username, newPassword));
         return trainer.getUser().getPassword();
     }
 
-    public String activeTrainer(@NotBlank String username) {
+    @Authenticated
+    @Transactional
+    public String changeStatus(@NotBlank String username, String password) {
         LOGGER.info("Activating trainer with username: {}", username);
 
-        Trainer trainer = selectTrainerByUserName(username);
-        trainer.getUser().setIsActive(userService.active(username));
+        Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
+        trainer.getUser().setIsActive(userService.changeStatus(username));
         return "Activated";
     }
 
-    public String deActiveTrainer(@NotBlank String username) {
-        LOGGER.info("Deactivating trainer with username: {}", username);
-        Trainer trainer = selectTrainerByUserName(username);
-        trainer.getUser().setIsActive(userService.deActive(username));
-        return "deActivated";
-    }
 
 }
