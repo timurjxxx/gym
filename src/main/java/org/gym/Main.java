@@ -12,15 +12,11 @@ import org.gym.service.TrainingService;
 import org.gym.service.UserService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
         try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class)) {
-            // Получаем бин из контекста (в данном случае, AppConfig)
-            // Можете добавить другие бины, если необходимо
             UserDAO userDAO = context.getBean(UserDAO.class);
             UserService userService = context.getBean(UserService.class);
             TrainerDAO trainerDAO = context.getBean(TrainerDAO.class);

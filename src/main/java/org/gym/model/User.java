@@ -5,11 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Table(name = "user_entity")

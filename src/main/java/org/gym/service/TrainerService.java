@@ -2,10 +2,8 @@ package org.gym.service;
 
 import org.gym.aspect.Authenticated;
 import org.gym.dao.TrainerDAO;
-import org.gym.model.Trainee;
 import org.gym.model.Trainer;
 import org.gym.model.Training;
-import org.gym.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;

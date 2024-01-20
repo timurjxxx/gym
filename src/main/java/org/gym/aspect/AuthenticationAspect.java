@@ -5,7 +5,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.gym.dao.UserDAO;
-import org.gym.model.Trainer;
 import org.gym.model.User;
 import org.springframework.stereotype.Component;
 
@@ -25,11 +24,10 @@ public class AuthenticationAspect {
 
         System.out.println("Authentication aspect is invoked.");
 
-        // Получите аргументы метода
         Object[] args = joinPoint.getArgs();
         if (args.length >= 2 &&
-                args[0] instanceof String &&   // проверка типа параметра username
-                args[1] instanceof String) {  // проверка типа параметра password
+                args[0] instanceof String &&
+                args[1] instanceof String) {
 
             String username = (String) args[0];
             String password = (String) args[1];

@@ -1,14 +1,10 @@
 package org.gym.service;
 
-import lombok.AllArgsConstructor;
 import org.gym.aspect.Authenticated;
 import org.gym.dao.TraineeDAO;
 import org.gym.model.Trainee;
-import org.gym.model.Trainer;
 import org.gym.model.Training;
-import org.gym.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
