@@ -14,11 +14,7 @@ public class Main {
         InMemoryStorage storage = context.getBean(InMemoryStorage.class);
         UserDAO userDAO = context.getBean(UserDAO.class);
         UserService userService = context.getBean(UserService.class);
-        User user = new User();
-        user.setFirstName("Tim");
-        user.setLastName("Rj");
-        User user1 = new User();
-        User user2 = userService.selectUser(1L);
-        System.out.println(user2);
+
+        System.out.println(storage.getStorageMap().toString());
     }
 }
