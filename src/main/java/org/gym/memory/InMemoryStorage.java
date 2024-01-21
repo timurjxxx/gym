@@ -32,9 +32,7 @@ public class InMemoryStorage {
     public Object save(String namespace, Long key, Object entity) {
 
         LOGGER.info("Save entity by namespace into memory");
-        Object object = storageMap.computeIfAbsent(namespace, k -> new HashMap<>()).put(key, entity);
-        writeToJsonFile("D://test.json");
-        return object;
+        return storageMap.computeIfAbsent(namespace, k -> new HashMap<>()).put(key, entity);
     }
 
     public Object get(String namespace, Long key) {

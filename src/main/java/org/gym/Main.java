@@ -1,6 +1,7 @@
 package org.gym;
 
 import org.gym.config.AppConfig;
+import org.gym.config.ApplicationShutdownListener;
 import org.gym.dao.UserDAO;
 import org.gym.memory.InMemoryStorage;
 import org.gym.memory.StorageInitialization;
@@ -16,7 +17,19 @@ public class Main {
         InMemoryStorage storage = context.getBean(InMemoryStorage.class);
         UserDAO userDAO = context.getBean(UserDAO.class);
         UserService userService = context.getBean(UserService.class);
-
-        System.out.println(storage.getStorageMap().toString());
+        ApplicationShutdownListener listener = context.getBean(ApplicationShutdownListener.class);
+        User user = new User();
+        user.setFirstName("qwe");
+        user.setLastName("llll");
+        User user1 = new User();
+        user1.setFirstName("ssssssss");
+        user1.setLastName("gggggggggg");
+        User user2 = new User();
+        user2.setFirstName("zzzzzzzzzz");
+        user2.setLastName("xxxxxxxxxxxx");
+        userService.createUser(user);
+        userService.createUser(user1);
+        userService.createUser(user2);
+        context.close();
     }
 }
