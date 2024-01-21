@@ -25,4 +25,12 @@ public class StorageInitialization {
         this.filePath = filePath;
     }
 
+    @PostConstruct
+    public void initializeStorageWithData() {
+        LOGGER.info("Initializing storage with data");
+        LOGGER.debug("File Path: {}", filePath);
+
+        inMemoryStorage.readFromJsonFile(filePath);
+    }
+
 }

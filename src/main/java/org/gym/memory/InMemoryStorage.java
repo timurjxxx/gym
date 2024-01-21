@@ -28,7 +28,6 @@ public class InMemoryStorage {
     @Setter
     private Map<String, Map<Long, Object>> storageMap = new HashMap<>();
     public InMemoryStorage(){
-        readFromJsonFile("D://test.json");
     }
     public Object save(String namespace, Long key, Object entity) {
 
