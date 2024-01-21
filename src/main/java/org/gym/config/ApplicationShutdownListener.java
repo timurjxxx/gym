@@ -8,7 +8,10 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 @Component
+
 public class ApplicationShutdownListener implements ApplicationListener<ContextClosedEvent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryStorage.class);
     private final String filePath;
@@ -16,8 +19,10 @@ public class ApplicationShutdownListener implements ApplicationListener<ContextC
 
     @Autowired
     public ApplicationShutdownListener(String filePath, InMemoryStorage inMemoryStorage) {
+
         this.filePath = filePath;
         this.inMemoryStorage = inMemoryStorage;
+
     }
 
 
@@ -26,6 +31,17 @@ public class ApplicationShutdownListener implements ApplicationListener<ContextC
         LOGGER.info("Save in file after shutdown");
 
         inMemoryStorage.writeToJsonFile(filePath);
+        LOGGER.info("Saving data to file before shutdown");
+
+    }
+
+    @PostConstruct
+    public void initializeStorageWithData() {
+        LOGGER.info("Initializing storage with data");
+        LOGGER.debug("File Path: {}", filePath);
+
+        inMemoryStorage.readFromJsonFile(filePath);
+        LOGGER.info("Data successfully loaded from file: {}", filePath);
 
     }
 }

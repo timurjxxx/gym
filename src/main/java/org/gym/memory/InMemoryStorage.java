@@ -1,81 +1,160 @@
 package org.gym.memory;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.Getter;
-import lombok.Setter;
+import org.gym.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component
 @Scope("singleton")
 public class InMemoryStorage {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryStorage.class);
     ObjectMapper objectMapper = new ObjectMapper();
-
     @Getter
-    @Setter
-    private Map<String, Map<Long, Object>> storageMap = new HashMap<>();
-    public InMemoryStorage(){
-    }
-    public Object save(String namespace, Long key, Object entity) {
+    public final Map<String, List<Identifiable>> storageMap = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryStorage.class);
 
-        LOGGER.info("Save entity by namespace into memory");
-        return storageMap.computeIfAbsent(namespace, k -> new HashMap<>()).put(key, entity);
-    }
 
-    public Object get(String namespace, Long key) {
-        LOGGER.info("Find entity by id ");
+    public Object save(String name, Identifiable entity) {
+        storageMap.computeIfAbsent(name, k -> new ArrayList<>()).add(entity);
+        LOGGER.info("Saved object to collection {} - {}", name, entity);
 
-        return storageMap.getOrDefault(namespace, new HashMap<>()).get(key);
+        return entity;
     }
 
-    public Map<Long, Object> getAll(String namespace) {
+    public Object get(String name, Long id) {
+        LOGGER.debug("Retrieved object with ID {} from collection {}", id, name);
 
-        return storageMap.getOrDefault(namespace, new HashMap<>());
+        return storageMap.getOrDefault(name, Collections.emptyList())
+                .stream()
+                .filter(obj -> obj instanceof Identifiable
+                        && Objects.equals(((Identifiable) obj).getId(), id))
+                .findFirst()
+                .orElse(null);
     }
 
-    public void delete(String namespace, Long key) {
-        LOGGER.info("Delete entity by id ");
 
-        if (storageMap.containsKey(namespace)) {
-            storageMap.get(namespace).remove(key);
+    public void deleteById(String name, Long id) {
+        storageMap.computeIfPresent(name, (key, objects) -> {
+            boolean removed = objects.removeIf(obj -> obj instanceof Identifiable
+                    && Objects.equals(((Identifiable) obj).getId(), id));
+
+            if (removed) {
+                LOGGER.info("Object with id {} successfully deleted from collection {}", id, name);
+
+            } else {
+                LOGGER.warn("Object with id {} not found in collection {}", id, name);
+
+            }
+
+            return objects;
+        });
+
+        if (!storageMap.containsKey(name)) {
+            LOGGER.warn("Collection {} does not exist", name);
+        }
+    }
+
+    public List<Identifiable> getAll(String namespace) {
+        LOGGER.debug("Retrieved all objects from collection {}", namespace);
+
+        return storageMap.getOrDefault(namespace, Collections.emptyList())
+                .stream()
+                .filter(obj -> obj instanceof Identifiable)
+                .collect(Collectors.toList());
+    }
+
+
+    public Object update(String name, Long id, Identifiable updatedObj) {
+        if (id == null) {
+            throw new IllegalArgumentException("Object ID cannot be null for update.");
+        }
+
+        Identifiable existingObj = (Identifiable) get(name, id);
+        if (existingObj != null) {
+            List<Identifiable> objects = storageMap.get(name);
+            objects.set(objects.indexOf(existingObj), updatedObj);
+            LOGGER.info("Object with id {} successfully updated in collection {}", id, name);
+            return updatedObj;
+        } else {
+            LOGGER.warn("Object with id {} not found in collection {}", id, name);
+            return null;
         }
     }
 
     public void writeToJsonFile(String filePath) {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(new File(filePath), storageMap);
-            System.out.println("Data has been written to " + filePath);
+            LOGGER.info("Data successfully written to file {}", filePath);
         } catch (IOException e) {
+            LOGGER.error("Error writing data to file {}", filePath, e);
+
             e.printStackTrace();
         }
     }
+
+
     public void readFromJsonFile(String filePath) {
         try {
-            TypeReference<Map<String, Map<Long, Object>>> typeRef = new TypeReference<Map<String, Map<Long, Object>>>() {};
-            Map<String, Map<Long, Object>> userMap = objectMapper.readValue(new File(filePath), typeRef);
+            TypeFactory typeFactory = objectMapper.getTypeFactory();
+            MapType mapType = typeFactory.constructMapType(HashMap.class, typeFactory.constructType(String.class),
+                    typeFactory.constructCollectionType(List.class, LinkedHashMap.class));
+            Map<String, List<LinkedHashMap>> userMap = objectMapper.readValue(new File(filePath), mapType);
+            storageMap.clear();
 
-            // Convert userMap to the type Map<String, Map<Long, Object>>
-            storageMap = new HashMap<>(userMap);
+            userMap.forEach((namespace, linkedHashMapList) -> {
+                List<Identifiable> objectList = storageMap.computeIfAbsent(namespace, k -> new ArrayList<>());
 
-            System.out.println("Данные успешно загружены из файла " + filePath);
+                linkedHashMapList.stream()
+                        .map(linkedHashMap -> objectMapper.convertValue(linkedHashMap, getClassForNamespace(namespace)))
+                        .filter(Objects::nonNull)
+                        .forEach(objectList::add);
+            });
+
+            LOGGER.info("Data successfully loaded from file {}", filePath);
+
         } catch (IOException e) {
+            LOGGER.error("Error loading data from file {}", filePath, e);
+
             e.printStackTrace();
         }
     }
 
+
+    private Class<? extends Identifiable> getClassForNamespace(String namespace) {
+        switch (namespace) {
+            case "User":
+                return User.class;
+            case "Training":
+                return Training.class;
+            case "Trainer":
+                return Trainer.class;
+            case "Trainee":
+                return Trainee.class;
+            default:
+                return null;
+        }
+    }
+
+
+    public boolean isUniqueId(String name, Long id) {
+        LOGGER.debug("Checking uniqueness for ID {} in collection {}", id, name);
+
+        return storageMap.getOrDefault(name, Collections.emptyList())
+                .stream()
+                .noneMatch(obj -> obj instanceof Identifiable && Objects.equals(((Identifiable) obj).getId(), id));
+
+    }
 
 }

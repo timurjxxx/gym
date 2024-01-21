@@ -3,15 +3,12 @@ package org.gym.service;
 
 import org.gym.dao.UserDAO;
 import org.gym.model.User;
+import org.gym.utils.Generate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 
 @Component
@@ -19,85 +16,64 @@ public class UserService {
     private final UserDAO userDAO;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-
-    private final AtomicLong idCounter = new AtomicLong(0);
+    private final String nameSpace = "User";
+    private final Generate generate;
 
 
     @Autowired
-    public UserService(UserDAO userDAO) {
+    public UserService(UserDAO userDAO, Generate generate) {
         this.userDAO = userDAO;
+        this.generate = generate;
     }
 
     public User selectUser(Long userId) {
-        return userDAO.get(userId);
+        LOGGER.debug("Selecting user with ID: {}", userId);
+
+        return userDAO.get(nameSpace,userId);
     }
 
     public User createUser(User newUser) {
-        LOGGER.info("create new user");
-        LOGGER.debug("New user details: {}", newUser);
+        LOGGER.info("Creating a new user");
 
-        newUser.setId(generateUniqueId());
+        Long userId = generate.generateUniqueId("User");
+        LOGGER.debug("Generated user ID: {}", userId);
+
+
+        newUser.setId(userId);
+        newUser.setPassword(generate.generatePassword());
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
-        newUser.setPassword(generatePassword());
-        LOGGER.debug("User created: {}", newUser);
-        return userDAO.save(newUser);
+        LOGGER.debug("Saving the new user to the database");
+
+        return userDAO.save(nameSpace,newUser);
+
     }
 
     public String generateUsername(String username1) {
-        LOGGER.info("Generate username");
+        LOGGER.info("Generating username");
         LOGGER.debug("Base username: {}", username1);
-
         return IntStream.iterate(1, i -> i + 1)
                 .mapToObj(serialNumber -> username1 + ((serialNumber == 1) ? "" : "." + serialNumber))
-                .filter(username -> userDAO.findByUsername(username) == null)
+                .filter(username -> !userDAO.findByUserName(nameSpace,username).isPresent())
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
     }
 
+    public User updateUser(Long id, User updatedUser) {
+        LOGGER.info("Updating user with ID: {}", id);
 
-    public String generatePassword() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder(10);
-        Random random = new Random();
-        for (int i = 0; i < 10; i++) {
-            int index = random.nextInt(chars.length());
-            sb.append(chars.charAt(index));
-        }
-        LOGGER.info("Generate unique password");
-        LOGGER.debug("Generated password: {}", sb.toString());
+        updatedUser.setId(id);
+        LOGGER.debug("Updating user details: {}", updatedUser);
 
+        return userDAO.update(nameSpace,id, updatedUser);
+    }
 
-        return sb.toString();
+    public void deleteUser(Long id) {
+        LOGGER.debug("Retrieving training details from the database");
+
+        userDAO.delete(nameSpace,id);
     }
 
 
-    public synchronized Long generateUniqueId() {
-        LOGGER.info("Generate unique id for entity ");
-        return idCounter.incrementAndGet();
-
-    }
-
-    public User updateUser(Long userId, User updatedUser) {
-        LOGGER.info("update user");
-        LOGGER.debug("Updated user details: {}", updatedUser);
-
-        User existingUser = userDAO.get(userId);
-
-        if (existingUser != null) {
-            updatedUser.setId(userId);
-            return userDAO.save(updatedUser);
-        } else {
-            LOGGER.warn("User with ID {} not found", userId);
-            throw new RuntimeException("User with ID " + userId + " not found");
-        }
-    }
 
 
-    public void deletetUser(Long userId) {
-        userDAO.delete(userId);
-    }
-
-    public Map<Long, Object> selectAllUsers() {
-        return userDAO.getAll();
-    }
 }

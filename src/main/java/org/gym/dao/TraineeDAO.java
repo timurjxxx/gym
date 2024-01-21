@@ -6,13 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 
 @Component
 public class TraineeDAO {
 
     private final InMemoryStorage storage;
-    private final String nameSpace = "Trainee";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TraineeDAO.class);
 
@@ -22,25 +20,22 @@ public class TraineeDAO {
     }
 
 
-    public Trainee get(Long traineeId) {
+    public Trainee get(String nameSpace, Long traineeId) {
         return (Trainee) storage.get(nameSpace, traineeId);
     }
 
-    public Trainee save(Trainee newTrainee) {
+    public Trainee save(String nameSpace,Trainee newTrainee) {
 
-        return (Trainee) storage.save(nameSpace, newTrainee.getId(), newTrainee);
+        return (Trainee) storage.save(nameSpace, newTrainee);
     }
 
-    public void delete(Long traineeId) {
-        storage.delete(nameSpace, traineeId);
+    public void delete(String nameSpace,Long id) {
+        storage.deleteById(nameSpace, id);
     }
 
-
-    public Map<Long, Object> getAll() {
-        return storage.getAll(nameSpace);
-
+    public Trainee update(String nameSpace,Long id, Trainee newTrainee) {
+        return (Trainee) storage.update(nameSpace, id, newTrainee);
     }
-
 
 
 }

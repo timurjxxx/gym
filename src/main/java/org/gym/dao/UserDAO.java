@@ -7,12 +7,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Component
 public class UserDAO {
-    private final String nameSpace = "User";
     private final InMemoryStorage storage;
     private static final Logger LOGGER = LoggerFactory.getLogger(UserDAO.class);
 
@@ -23,40 +24,41 @@ public class UserDAO {
         this.storage = storage;
     }
 
-    public User get(Long userId) {
+    public User get(String  nameSpace,Long userId) {
         return (User) storage.get(nameSpace, userId);
     }
 
-    public User save(User newUser) {
-        return (User) storage.save(nameSpace, newUser.getId(), newUser);
+    public User save(String  nameSpace,User newUser) {
+
+        return (User) storage.save(nameSpace, newUser);
     }
 
-    public void delete(Long userId) {
-        storage.delete(nameSpace, userId);
+    public void delete(String  nameSpace,Long id) {
+        storage.deleteById(nameSpace, id);
     }
 
+    public Optional<User> findByUserName(String  nameSpace,String userName) {
+        List<User> userList = storage.getAll(nameSpace)
+                .stream()
+                .filter(obj -> obj instanceof User)
+                .map(obj -> (User) obj)
+                .filter(user -> userName.equals(user.getUserName()))
+                .collect(Collectors.toList());
 
-    public Map<Long, Object> getAll() {
-        return storage.getAll(nameSpace);
+        if (!userList.isEmpty()) {
+            LOGGER.debug("User with username '{}' found in collection {}", userName, nameSpace);
 
-    }
-
-    public User findByUsername(String username) {
-
-        LOGGER.info("Find user by uer name");
-        for (Map<Long, Object> innerMap : storage.getStorageMap().values()) {
-            for (Object obj : innerMap.values()) {
-                if (obj instanceof User) {
-                    User user = (User) obj;
-                    String userUsername = user.getUserName();
-                    if (userUsername != null && userUsername.equals(username)) {
-                        return user;
-                    }
-                }
-            }
+            return Optional.of(userList.get(0));
+        } else {
+            LOGGER.debug("User with username '{}' not found in collection {}", userName, nameSpace);
+            return Optional.empty();
         }
-        return null;
     }
+
+    public User update(String  nameSpace,Long id, User newUser) {
+        return (User) storage.update(nameSpace, id, newUser);
+    }
+
 
 
 }
