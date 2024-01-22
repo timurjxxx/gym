@@ -2,14 +2,11 @@ package org.gym.dao;
 
 import org.gym.memory.InMemoryStorage;
 import org.gym.model.Trainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 
 @Component
 public class TrainerDAO {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrainerDAO.class);
 
     private final InMemoryStorage storage;
 

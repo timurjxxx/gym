@@ -26,7 +26,14 @@ public class Trainee implements Identifiable {
 
     private User user;
 
-
-
+    @Override
+    public String toString() {
+        return "Trainee{" +
+                "id=" + id +
+                ", dateOfBirth=" + dateOfBirth +
+                ", address='" + address + '\'' +
+                ", user=" + user +
+                '}';
+    }
 }
 

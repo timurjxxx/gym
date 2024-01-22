@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Data
 @AllArgsConstructor
+@Builder
 public class Trainer implements Identifiable {
 
     @JsonProperty("id")

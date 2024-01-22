@@ -2,8 +2,6 @@ package org.gym.dao;
 
 import org.gym.memory.InMemoryStorage;
 import org.gym.model.Trainee;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 
@@ -12,7 +10,6 @@ public class TraineeDAO {
 
     private final InMemoryStorage storage;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TraineeDAO.class);
 
 
     public TraineeDAO(InMemoryStorage storage) {

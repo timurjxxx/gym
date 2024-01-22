@@ -7,6 +7,7 @@ import org.gym.dao.TrainerDAO;
 import org.gym.dao.TrainingDAO;
 import org.gym.dao.UserDAO;
 import org.gym.memory.InMemoryStorage;
+import org.gym.model.Trainer;
 import org.gym.model.User;
 import org.gym.service.TraineeService;
 import org.gym.service.TrainerService;
@@ -33,6 +34,9 @@ public class Main {
         user.setFirstName("USer");
         user.setLastName("JJ");
         userService.createUser(user);
+        Trainer trainer = new Trainer();
+        trainerService.createTrainer(trainer,1L);
+        System.out.println(trainerService.selectTrainer(1L) +"HHHHHHHHHHEEEEEEEEEEEERRRRRRRRR");
 
 //        System.out.println(storage.getStorageMap().toString());
 //        User user1 = new User();
