@@ -14,121 +14,187 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TrainingTest {
 
     @Test
-    void testEquals() {
-        Trainee trainee1 = new Trainee(1L, new Date(), "Address1", null);
-        Trainer trainer1 = new Trainer(1L, "Specialization1", null);
+    void toStringTest() {
+        Long trainingId = 1L;
+        Trainee trainee = new Trainee();
+        trainee.setId(2L);
+        trainee.setFirstName("John");
+        trainee.setLastName("Doe");
+        trainee.setUserName("john.doe");
+        trainee.setPassword("password123");
+        trainee.setIsActive(true);
+        trainee.setDateOfBirth(new Date());
+        trainee.setAddress("123 Main St");
 
-        List<TrainingType> trainingTypes1 = new ArrayList<>();
-        trainingTypes1.add(new TrainingType(1L, "Type1"));
+        Trainer trainer = new Trainer();
+        trainer.setId(3L);
+        trainer.setFirstName("Jane");
+        trainer.setLastName("Doe");
+        trainer.setUserName("jane.doe");
+        trainer.setPassword("password456");
+        trainer.setIsActive(false);
+        trainer.setSpecialization("Yoga");
 
-        Training training1 = new Training(1L, trainee1, trainer1, "Training1", new Date(), 10, trainingTypes1);
-        Training training2 = new Training(1L, trainee1, trainer1, "Training1", new Date(), 10, trainingTypes1);
-        Training training3 = new Training(2L, trainee1, trainer1, "Training1", new Date(), 10, trainingTypes1);
+        String trainingName = "Running";
+        Date trainingDate = new Date();
+        Number trainingDuration = 60;
+        List<TrainingType> trainingType = List.of(new TrainingType(1L, "Cardio"));
+
+        Training training = new Training();
+        training.setId(trainingId);
+        training.setTraineeId(trainee);
+        training.setTrainerId(trainer);
+        training.setTrainingName(trainingName);
+        training.setTrainingDate(trainingDate);
+        training.setTrainingDuration(trainingDuration);
+        training.setTrainingType(trainingType);
+
+        String expectedToString = "Training{" +
+                "id=" + trainingId +
+                ", traineeId=" + trainee +
+                ", trainerId=" + trainer +
+                ", trainingName='" + trainingName + '\'' +
+                ", trainingDate=" + trainingDate +
+                ", trainingDuration=" + trainingDuration +
+                '}';
+
+        assertEquals(expectedToString, training.toString());
+    }
+    @Test
+    void equalsAndHashCodeTest() {
+        Long trainingId = 1L;
+        Trainee trainee = new Trainee();
+        trainee.setId(2L);
+        trainee.setFirstName("John");
+        trainee.setLastName("Doe");
+        trainee.setUserName("john.doe");
+        trainee.setPassword("password123");
+        trainee.setIsActive(true);
+        trainee.setDateOfBirth(new Date());
+        trainee.setAddress("123 Main St");
+
+        Trainer trainer = new Trainer();
+        trainer.setId(3L);
+        trainer.setFirstName("Jane");
+        trainer.setLastName("Doe");
+        trainer.setUserName("jane.doe");
+        trainer.setPassword("password456");
+        trainer.setIsActive(false);
+        trainer.setSpecialization("Yoga");
+
+        String trainingName = "Running";
+        Date trainingDate = new Date();
+        Number trainingDuration = 60;
+        List<TrainingType> trainingType = List.of(new TrainingType(1L, "Cardio"));
+
+        Training training1 = new Training();
+        training1.setId(trainingId);
+        training1.setTraineeId(trainee);
+        training1.setTrainerId(trainer);
+        training1.setTrainingName(trainingName);
+        training1.setTrainingDate(trainingDate);
+        training1.setTrainingDuration(trainingDuration);
+        training1.setTrainingType(trainingType);
+
+        Training training2 = new Training();
+        training2.setId(trainingId);
+        training2.setTraineeId(trainee);
+        training2.setTrainerId(trainer);
+        training2.setTrainingName(trainingName);
+        training2.setTrainingDate(trainingDate);
+        training2.setTrainingDuration(trainingDuration);
+        training2.setTrainingType(trainingType);
 
         assertEquals(training1, training2);
-        assertNotEquals(training1, training3);
-    }
-
-    @Test
-    void testHashCode() {
-        Trainee trainee1 = new Trainee(1L, new Date(), "Address1", null);
-        Trainer trainer1 = new Trainer(1L, "Specialization1", null);
-
-        List<TrainingType> trainingTypes1 = new ArrayList<>();
-        trainingTypes1.add(new TrainingType(1L, "Type1"));
-
-        Training training1 = new Training(1L, trainee1, trainer1, "Training1", new Date(), 10, trainingTypes1);
-        Training training2 = new Training(1L, trainee1, trainer1, "Training1", new Date(), 10, trainingTypes1);
-        Training training3 = new Training(2L, trainee1, trainer1, "Training1", new Date(), 10, trainingTypes1);
-
         assertEquals(training1.hashCode(), training2.hashCode());
-        assertNotEquals(training1.hashCode(), training3.hashCode());
+
+        training2.setTrainingName("Swimming");
+
+        assertNotEquals(training1, training2);
+        assertNotEquals(training1.hashCode(), training2.hashCode());
     }
 
     @Test
-    void testBuilder() {
-        Trainee trainee = new Trainee(1L, new Date(), "Address1", null);
-        Trainer trainer = new Trainer(1L, "Specialization1", null);
+    void getterSetterTest() {
+        Training training = new Training();
 
-        List<TrainingType> trainingTypes = new ArrayList<>();
-        trainingTypes.add(new TrainingType(1L, "Type1"));
+        Long trainingId = 1L;
+        Trainee trainee = new Trainee();
+        trainee.setId(2L);
+        trainee.setFirstName("John");
+        trainee.setLastName("Doe");
+        trainee.setUserName("john.doe");
+        trainee.setPassword("password123");
+        trainee.setIsActive(true);
+        trainee.setDateOfBirth(new Date());
+        trainee.setAddress("123 Main St");
 
-        Training training = Training.builder()
-                .id(1L)
-                .traineeId(trainee)
-                .trainerId(trainer)
-                .trainingName("Training1")
-                .trainingDate(new Date())
-                .trainingDuration(10)
-                .trainingType(trainingTypes)
-                .build();
+        Trainer trainer = new Trainer();
+        trainer.setId(3L);
+        trainer.setFirstName("Jane");
+        trainer.setLastName("Doe");
+        trainer.setUserName("jane.doe");
+        trainer.setPassword("password456");
+        trainer.setIsActive(false);
+        trainer.setSpecialization("Yoga");
 
-        assertNotNull(training);
-        assertEquals(1L, training.getId());
+        String trainingName = "Running";
+        Date trainingDate = new Date();
+        Number trainingDuration = 60;
+        List<TrainingType> trainingType = List.of(new TrainingType(1L, "Cardio"));
+
+        training.setId(trainingId);
+        training.setTraineeId(trainee);
+        training.setTrainerId(trainer);
+        training.setTrainingName(trainingName);
+        training.setTrainingDate(trainingDate);
+        training.setTrainingDuration(trainingDuration);
+        training.setTrainingType(trainingType);
+
+        assertEquals(trainingId, training.getId());
         assertEquals(trainee, training.getTraineeId());
         assertEquals(trainer, training.getTrainerId());
-        assertEquals("Training1", training.getTrainingName());
-        assertNotNull(training.getTrainingDate());
-        assertEquals(10, training.getTrainingDuration());
-        assertEquals(trainingTypes, training.getTrainingType());
+        assertEquals(trainingName, training.getTrainingName());
+        assertEquals(trainingDate, training.getTrainingDate());
+        assertEquals(trainingDuration, training.getTrainingDuration());
+        assertEquals(trainingType, training.getTrainingType());
     }
 
     @Test
-    void testGetterSetterAllArgsConstructor() {
-        Trainee trainee = new Trainee(1L, new Date(), "Address1", null);
-        Trainer trainer = new Trainer(1L, "Specialization1", null);
+    void allArgsConstructorTest() {
+        Long trainingId = 1L;
+        Trainee trainee = new Trainee();
+        trainee.setId(2L);
+        trainee.setFirstName("John");
+        trainee.setLastName("Doe");
+        trainee.setUserName("john.doe");
+        trainee.setPassword("password123");
+        trainee.setIsActive(true);
+        trainee.setDateOfBirth(new Date());
+        trainee.setAddress("123 Main St");
 
-        List<TrainingType> trainingTypes = new ArrayList<>();
-        trainingTypes.add(new TrainingType(1L, "Type1"));
+        Trainer trainer = new Trainer();
+        trainer.setId(3L);
+        trainer.setFirstName("Jane");
+        trainer.setLastName("Doe");
+        trainer.setUserName("jane.doe");
+        trainer.setPassword("password456");
+        trainer.setIsActive(false);
+        trainer.setSpecialization("Yoga");
 
-        Training training = new Training(1L, trainee, trainer, "Training1", new Date(), 10, trainingTypes);
+        String trainingName = "Running";
+        Date trainingDate = new Date();
+        Number trainingDuration = 60;
+        List<TrainingType> trainingType = List.of(new TrainingType(1L, "Cardio"));
 
-        assertEquals(1L, training.getId());
+        Training training = new Training(trainingId, trainee, trainer, trainingName, trainingDate, trainingDuration, trainingType);
+
+        assertEquals(trainingId, training.getId());
         assertEquals(trainee, training.getTraineeId());
         assertEquals(trainer, training.getTrainerId());
-        assertEquals("Training1", training.getTrainingName());
-        assertNotNull(training.getTrainingDate());
-        assertEquals(10, training.getTrainingDuration());
-        assertEquals(trainingTypes, training.getTrainingType());
-
-        Trainee newTrainee = new Trainee(2L, new Date(), "Address2", null);
-        Trainer newTrainer = new Trainer(2L, "Specialization2", null);
-
-        List<TrainingType> newTrainingTypes = new ArrayList<>();
-        newTrainingTypes.add(new TrainingType(2L, "Type2"));
-
-        training.setId(2L);
-        training.setTraineeId(newTrainee);
-        training.setTrainerId(newTrainer);
-        training.setTrainingName("Training2");
-        training.setTrainingDate(new Date());
-        training.setTrainingDuration(20);
-        training.setTrainingType(newTrainingTypes);
-
-        assertEquals(2L, training.getId());
-        assertEquals(newTrainee, training.getTraineeId());
-        assertEquals(newTrainer, training.getTrainerId());
-        assertEquals("Training2", training.getTrainingName());
-        assertNotNull(training.getTrainingDate());
-        assertEquals(20, training.getTrainingDuration());
-        assertEquals(newTrainingTypes, training.getTrainingType());
-    }
-    @Test
-    void testAllArgsConstructor() {
-        Trainee trainee = new Trainee(1L, new Date(), "Address1", null);
-        Trainer trainer = new Trainer(1L, "Specialization1", null);
-
-        List<TrainingType> trainingTypes = new ArrayList<>();
-        trainingTypes.add(new TrainingType(1L, "Type1"));
-
-        Training training = new Training(1L, trainee, trainer, "Training1", new Date(), 10, trainingTypes);
-
-        assertEquals(1L, training.getId());
-        assertEquals(trainee, training.getTraineeId());
-        assertEquals(trainer, training.getTrainerId());
-        assertEquals("Training1", training.getTrainingName());
-        assertNotNull(training.getTrainingDate());
-        assertEquals(10, training.getTrainingDuration());
-        assertEquals(trainingTypes, training.getTrainingType());
+        assertEquals(trainingName, training.getTrainingName());
+        assertEquals(trainingDate, training.getTrainingDate());
+        assertEquals(trainingDuration, training.getTrainingDuration());
+        assertEquals(trainingType, training.getTrainingType());
     }
 }

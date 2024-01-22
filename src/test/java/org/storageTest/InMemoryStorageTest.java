@@ -1,195 +1,283 @@
 package org.storageTest;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
 import org.gym.memory.InMemoryStorage;
-import org.gym.model.Identifiable;
+import org.gym.model.Trainee;
 import org.gym.model.Trainer;
+import org.gym.model.Training;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.slf4j.Logger;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 class InMemoryStorageTest {
 
 
+
+    @Mock
+    private ObjectMapper objectMapper;
+
+
+    @InjectMocks
     private InMemoryStorage inMemoryStorage;
 
     @BeforeEach
-    public void setUp() {
-        inMemoryStorage = new InMemoryStorage();
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void saveAndGet() {
+    void saveTest() {
+        String trainerNamespace = "Trainer";
         Trainer trainer = new Trainer();
         trainer.setId(1L);
-        trainer.setSpecialization("Fitness");
+        trainer.setFirstName("John");
+        trainer.setLastName("Doe");
+        trainer.setUserName("john.doe");
+        trainer.setPassword("password123");
+        trainer.setIsActive(true);
+        trainer.setSpecialization("Running");
 
-        inMemoryStorage.save("Trainer", trainer);
+        inMemoryStorage.save(trainerNamespace, trainer);
 
-        Identifiable retrievedTrainer = (Identifiable) inMemoryStorage.get("Trainer", 1L);
+        assertTrue(inMemoryStorage.getStorageMap().containsKey(trainerNamespace));
+        assertEquals(1, inMemoryStorage.getStorageMap().get(trainerNamespace).size());
+        assertEquals(trainer, inMemoryStorage.getStorageMap().get(trainerNamespace).get(0));
 
-        assertNotNull(retrievedTrainer);
-        assertEquals(trainer.getId(), retrievedTrainer.getId());
-        assertEquals(trainer.getSpecialization(), ((Trainer) retrievedTrainer).getSpecialization());
+        String traineeNamespace = "Trainee";
+        Trainee trainee = new Trainee();
+        trainee.setId(2L);
+        trainee.setFirstName("Alice");
+        trainee.setLastName("Smith");
+        trainee.setUserName("alice.smith");
+        trainee.setPassword("password456");
+        trainee.setIsActive(true);
+        trainee.setDateOfBirth(new Date());
+        trainee.setAddress("123 Main St");
+
+        inMemoryStorage.save(traineeNamespace, trainee);
+
+        assertTrue(inMemoryStorage.getStorageMap().containsKey(traineeNamespace));
+        assertEquals(1, inMemoryStorage.getStorageMap().get(traineeNamespace).size());
+        assertEquals(trainee, inMemoryStorage.getStorageMap().get(traineeNamespace).get(0));
+
+        String trainingNamespace = "Training";
+        Training training = new Training();
+        training.setId(1L);
+        training.setTrainerId(trainer);
+        training.setTraineeId(trainee);
+        training.setTrainingName("Running");
+
+        inMemoryStorage.save(trainingNamespace, training);
+
+        assertTrue(inMemoryStorage.getStorageMap().containsKey(trainingNamespace));
+        assertEquals(1, inMemoryStorage.getStorageMap().get(trainingNamespace).size());
+        assertEquals(training, inMemoryStorage.getStorageMap().get(trainingNamespace).get(0));
     }
 
-    @Test
-    public void update() {
-        Trainer trainer = new Trainer();
-        trainer.setId(1L);
-        trainer.setSpecialization("Fitness");
 
-        inMemoryStorage.save("Trainer", trainer);
-
-        Trainer updatedTrainer = new Trainer();
-        updatedTrainer.setId(1L);
-        updatedTrainer.setSpecialization("Yoga");
-
-        inMemoryStorage.update("Trainer", 1L, updatedTrainer);
-
-        Identifiable retrievedTrainer = (Identifiable) inMemoryStorage.get("Trainer", 1L);
-
-        assertNotNull(retrievedTrainer);
-        assertEquals(updatedTrainer.getId(), retrievedTrainer.getId());
-        assertEquals(updatedTrainer.getSpecialization(), ((Trainer) retrievedTrainer).getSpecialization());
-    }
 
     @Test
-    public void delete() {
-        Trainer trainer = new Trainer();
-        trainer.setId(1L);
-        trainer.setSpecialization("Fitness");
-
-        inMemoryStorage.save("Trainer", trainer);
-
-        inMemoryStorage.deleteById("Trainer", 1L);
-
-        Identifiable retrievedTrainer = (Identifiable) inMemoryStorage.get("Trainer", 1L);
-
-        assertNull(retrievedTrainer);
-    }
-
-    @Test
-    public void getAll() {
+    void testFindAll() {
+        // Test for Trainer
+        String trainerName = "Trainer";
         Trainer trainer1 = new Trainer();
         trainer1.setId(1L);
-        trainer1.setSpecialization("Fitness");
+        trainer1.setFirstName("John");
+        trainer1.setLastName("Doe");
+        trainer1.setUserName("john.doe");
+        trainer1.setPassword("password123");
+        trainer1.setIsActive(true);
+        trainer1.setSpecialization("Running");
 
         Trainer trainer2 = new Trainer();
         trainer2.setId(2L);
-        trainer2.setSpecialization("Yoga");
+        trainer2.setFirstName("Alice");
+        trainer2.setLastName("Smith");
+        trainer2.setUserName("alice.smith");
+        trainer2.setPassword("password456");
+        trainer2.setIsActive(true);
+        trainer2.setSpecialization("Cycling");
 
-        inMemoryStorage.save("Trainer", trainer1);
-        inMemoryStorage.save("Trainer", trainer2);
+        List<Object> trainerEntities = Arrays.asList(trainer1, trainer2);
 
-        List<Identifiable> trainers = inMemoryStorage.getAll("Trainer");
+        inMemoryStorage.getStorageMap().put(trainerName, trainerEntities);
 
-        assertNotNull(trainers);
-        assertEquals(2, trainers.size());
+        List<Object> allTrainers = inMemoryStorage.findAll(trainerName);
+
+        assertEquals(trainerEntities, allTrainers);
+
+
+        // Test for Trainee
+        String traineeName = "Trainee";
+        Trainee trainee1 = new Trainee();
+        trainee1.setId(1L);
+        trainee1.setFirstName("Bob");
+        trainee1.setLastName("Johnson");
+        trainee1.setUserName("bob.johnson");
+        trainee1.setPassword("password789");
+        trainee1.setIsActive(true);
+        trainee1.setDateOfBirth(new Date());
+        trainee1.setAddress("456 Oak St");
+
+        Trainee trainee2 = new Trainee();
+        trainee2.setId(2L);
+        trainee2.setFirstName("Eva");
+        trainee2.setLastName("Brown");
+        trainee2.setUserName("eva.brown");
+        trainee2.setPassword("passwordabc");
+        trainee2.setIsActive(true);
+        trainee2.setDateOfBirth(new Date());
+        trainee2.setAddress("789 Pine St");
+
+        List<Object> traineeEntities = Arrays.asList(trainee1, trainee2);
+
+        inMemoryStorage.getStorageMap().put(traineeName, traineeEntities);
+
+        List<Object> allTrainees = inMemoryStorage.findAll(traineeName);
+
+        assertEquals(traineeEntities, allTrainees);
     }
-
     @Test
-    public void writeAndReadFromJsonFile() {
+    void testWriteToJsonFile() throws IOException {
+        String filePath = "test.json";
+        doNothing().when(objectMapper).writeValue(any(File.class), eq(inMemoryStorage.getStorageMap()));
+
+        inMemoryStorage.writeToJsonFile(filePath);
+
+        verify(objectMapper, times(1)).writeValue(any(File.class), eq(inMemoryStorage.getStorageMap()));
+    }
+    @Test
+    void findByIdTest() {
+        String trainerNamespace = "Trainer";
+        Long trainerId = 1L;
         Trainer trainer = new Trainer();
-        trainer.setId(1L);
-        trainer.setSpecialization("Fitness");
+        trainer.setId(trainerId);
+        List<Object> trainerEntities = Arrays.asList(trainer);
 
-        inMemoryStorage.save("Trainer", trainer);
+        inMemoryStorage.getStorageMap().put(trainerNamespace, trainerEntities);
 
-        inMemoryStorage.writeToJsonFile("test.json");
+        Object foundTrainer = inMemoryStorage.findById(trainerNamespace, trainerId);
 
-        InMemoryStorage newStorage = new InMemoryStorage();
-        newStorage.readFromJsonFile("test.json");
+        assertEquals(trainer, foundTrainer);
 
-        Identifiable retrievedTrainer = (Identifiable) newStorage.get("Trainer", 1L);
+        String traineeNamespace = "Trainee";
+        Long traineeId = 2L;
+        Trainee trainee = new Trainee();
+        trainee.setId(traineeId);
+        List<Object> traineeEntities = Arrays.asList(trainee);
 
-        assertNotNull(retrievedTrainer);
-        assertEquals(trainer.getId(), retrievedTrainer.getId());
-        assertEquals(trainer.getSpecialization(), ((Trainer) retrievedTrainer).getSpecialization());
+        inMemoryStorage.getStorageMap().put(traineeNamespace, traineeEntities);
+
+        Object foundTrainee = inMemoryStorage.findById(traineeNamespace, traineeId);
+
+        assertEquals(trainee, foundTrainee);
+
+        String trainingNamespace = "Training";
+        Long trainingId = 1L;
+        Training training = new Training();
+        training.setId(trainingId);
+        List<Object> trainingEntities = Arrays.asList(training);
+
+        inMemoryStorage.getStorageMap().put(trainingNamespace, trainingEntities);
+
+        Object foundTraining = inMemoryStorage.findById(trainingNamespace, trainingId);
+
+        assertEquals(training, foundTraining);
     }
 
-    @Test
-    public void isUniqueId() {
-        Trainer trainer = new Trainer();
-        trainer.setId(1L);
-        trainer.setSpecialization("Fitness");
-
-        inMemoryStorage.save("Trainer", trainer);
-
-        boolean isUniqueId = inMemoryStorage.isUniqueId("Trainer", 2L);
-        assertTrue(isUniqueId);
-
-        isUniqueId = inMemoryStorage.isUniqueId("Trainer", 1L);
-        assertFalse(isUniqueId);
-    }
 
     @Test
-    public void deleteNonExistingObject() {
-        inMemoryStorage.deleteById("Trainer", 123L); // Non-existing ID, nothing should happen
-        List<Identifiable> trainers = inMemoryStorage.getAll("Trainer");
-        assertNotNull(trainers);
-        assertTrue(trainers.isEmpty());
-    }
+    void testUpdate() {
+        String trainerName = "Trainer";
+        Long trainerId = 1L;
 
-    @Test
-    public void updateNonExistingObject() {
         Trainer updatedTrainer = new Trainer();
-        updatedTrainer.setId(123L);
-        updatedTrainer.setSpecialization("UpdatedSpecialization");
+        updatedTrainer.setId(trainerId);
+        updatedTrainer.setFirstName("Updated");
+        updatedTrainer.setLastName("Trainer");
+        updatedTrainer.setUserName("updated.trainer");
+        updatedTrainer.setPassword("newpassword");
+        updatedTrainer.setIsActive(true);
+        updatedTrainer.setSpecialization("Updated Specialization");
 
-        Identifiable result = (Identifiable) inMemoryStorage.update("Trainer", 123L, updatedTrainer);
-        assertNull(result);
+        Trainer originalTrainer = new Trainer();
+        originalTrainer.setId(trainerId);
+        originalTrainer.setFirstName("John");
+        originalTrainer.setLastName("Doe");
+        originalTrainer.setUserName("john.doe");
+        originalTrainer.setPassword("password123");
+        originalTrainer.setIsActive(true);
+        originalTrainer.setSpecialization("Running");
+
+        List<Object> trainerEntities = Arrays.asList(originalTrainer);
+
+        inMemoryStorage.getStorageMap().put(trainerName, trainerEntities);
+
+        inMemoryStorage.update(trainerName, trainerId, updatedTrainer);
+
+        assertEquals(updatedTrainer, inMemoryStorage.getStorageMap().get(trainerName).get(0));
+
+
+        String traineeName = "Trainee";
+        Long traineeId = 2L;
+
+        Trainee updatedTrainee = new Trainee();
+        updatedTrainee.setId(traineeId);
+        updatedTrainee.setFirstName("Updated");
+        updatedTrainee.setLastName("Trainee");
+        updatedTrainee.setUserName("updated.trainee");
+        updatedTrainee.setPassword("newpassword");
+        updatedTrainee.setIsActive(true);
+        updatedTrainee.setDateOfBirth(new Date());
+        updatedTrainee.setAddress("Updated Address");
+
+        Trainee originalTrainee = new Trainee();
+        originalTrainee.setId(traineeId);
+        originalTrainee.setFirstName("Alice");
+        originalTrainee.setLastName("Smith");
+        originalTrainee.setUserName("alice.smith");
+        originalTrainee.setPassword("password456");
+        originalTrainee.setIsActive(true);
+        originalTrainee.setDateOfBirth(new Date());
+        originalTrainee.setAddress("123 Main St");
+
+        List<Object> traineeEntities = Arrays.asList(originalTrainee);
+
+        inMemoryStorage.getStorageMap().put(traineeName, traineeEntities);
+
+        inMemoryStorage.update(traineeName, traineeId, updatedTrainee);
+
+        assertEquals(updatedTrainee, inMemoryStorage.getStorageMap().get(traineeName).get(0));
+
+
     }
-    @Test
-    public void readFromJsonFile() {
-        Trainer trainer1 = new Trainer();
-        trainer1.setId(1L);
-        trainer1.setSpecialization("Fitness");
 
-        Trainer trainer2 = new Trainer();
-        trainer2.setId(2L);
-        trainer2.setSpecialization("Yoga");
-
-        inMemoryStorage.save("Trainer", trainer1);
-        inMemoryStorage.save("Trainer", trainer2);
-
-        inMemoryStorage.writeToJsonFile("test.json");
-
-        InMemoryStorage newStorage = new InMemoryStorage();
-
-        newStorage.readFromJsonFile("test.json");
-
-        List<Identifiable> trainers = newStorage.getAll("Trainer");
-
-        assertNotNull(trainers);
-        assertEquals(2, trainers.size());
-
-        Identifiable retrievedTrainer1 = (Identifiable) newStorage.get("Trainer", 1L);
-        assertNotNull(retrievedTrainer1);
-        assertEquals(trainer1.getId(), retrievedTrainer1.getId());
-        assertEquals(trainer1.getSpecialization(), ((Trainer) retrievedTrainer1).getSpecialization());
-
-        Identifiable retrievedTrainer2 = (Identifiable) newStorage.get("Trainer", 2L);
-        assertNotNull(retrievedTrainer2);
-        assertEquals(trainer2.getId(), retrievedTrainer2.getId());
-        assertEquals(trainer2.getSpecialization(), ((Trainer) retrievedTrainer2).getSpecialization());
-    }
 
 }

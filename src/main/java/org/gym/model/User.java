@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User  implements Identifiable{
+public class User  {
     @JsonProperty("id")
     private Long id;
     @JsonProperty("firstName")

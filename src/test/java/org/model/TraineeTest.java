@@ -11,88 +11,150 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TraineeTest {
 
     @Test
-    void testTraineeBuilder() {
+    void toStringTest() {
         Long traineeId = 1L;
-        Date dateOfBirth = new Date();
+        String firstName = "John";
+        String lastName = "Doe";
         String address = "123 Main St";
-        User user = new User();
+        String password = "password123";
+        String userName = "john.doe";
+        Date dateOfBirth = new Date();
+        Boolean isActive = true;
 
-        Trainee trainee = Trainee.builder()
-                .id(traineeId)
-                .dateOfBirth(dateOfBirth)
-                .address(address)
-                .user(user)
-                .build();
+        Trainee trainee = new Trainee();
+        trainee.setId(traineeId);
+        trainee.setFirstName(firstName);
+        trainee.setLastName(lastName);
+        trainee.setAddress(address);
+        trainee.setPassword(password);
+        trainee.setUserName(userName);
+        trainee.setDateOfBirth(dateOfBirth);
+        trainee.setIsActive(isActive);
 
-        assertNotNull(trainee);
-        assertEquals(traineeId, trainee.getId());
-        assertEquals(dateOfBirth, trainee.getDateOfBirth());
-        assertEquals(address, trainee.getAddress());
-        assertEquals(user, trainee.getUser());
+        String expectedToString = "Trainee{" +
+                "id=" + traineeId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", isActive=" + isActive +
+                ", dateOfBirth=" + dateOfBirth +
+                ", address='" + address + '\'' +
+                '}';
+
+        assertEquals(expectedToString, trainee.toString());
     }
 
     @Test
-    void testTraineeToString() {
-        Trainee trainee = new Trainee(1L, new Date(), "123 Main St", new User());
+    void hashCodeAndEqualsTest() {
+        Long traineeId = 1L;
+        String firstName = "John";
+        String lastName = "Doe";
+        String address = "123 Main St";
+        String password = "password123";
+        String userName = "john.doe";
+        Date dateOfBirth = new Date();
+        Boolean isActive = true;
 
-        String result = trainee.toString();
+        Trainee trainee1 = new Trainee();
+        trainee1.setId(traineeId);
+        trainee1.setFirstName(firstName);
+        trainee1.setLastName(lastName);
+        trainee1.setAddress(address);
+        trainee1.setPassword(password);
+        trainee1.setUserName(userName);
+        trainee1.setDateOfBirth(dateOfBirth);
+        trainee1.setIsActive(isActive);
 
-        assertNotNull(result);
-        assertTrue(result.contains("id=" + trainee.getId()));
-        assertTrue(result.contains("dateOfBirth=" + trainee.getDateOfBirth()));
-        assertTrue(result.contains("address='" + trainee.getAddress() + "'"));
-        assertTrue(result.contains("user=" + trainee.getUser()));
-    }
+        Trainee trainee2 = new Trainee();
+        trainee2.setId(traineeId);
+        trainee2.setFirstName(firstName);
+        trainee2.setLastName(lastName);
+        trainee2.setAddress(address);
+        trainee2.setPassword(password);
+        trainee2.setUserName(userName);
+        trainee2.setDateOfBirth(dateOfBirth);
+        trainee2.setIsActive(isActive);
 
-    @Test
-    void testTraineeEqualsAndHashCode() {
-        Trainee trainee1 = new Trainee(1L, new Date(), "123 Main St", new User());
-        Trainee trainee2 = new Trainee(1L, new Date(), "123 Main St", new User());
-        Trainee trainee3 = new Trainee(2L, new Date(), "456 Side St", new User());
+        Trainee trainee3 = new Trainee();
+        trainee3.setId(2L);
+        trainee3.setFirstName("Jane");
+        trainee3.setLastName("Doe");
+        trainee3.setAddress("456 Oak St");
+        trainee3.setPassword("password456");
+        trainee3.setUserName("jane.doe");
+        trainee3.setDateOfBirth(new Date());
+        trainee3.setIsActive(false);
+
+        int hashCode1 = trainee1.hashCode();
+        int hashCode2 = trainee2.hashCode();
 
         assertEquals(trainee1, trainee2);
         assertNotEquals(trainee1, trainee3);
-        assertNotEquals(trainee2, trainee3);
-
-        assertEquals(trainee1.hashCode(), trainee2.hashCode());
-        assertNotEquals(trainee1.hashCode(), trainee3.hashCode());
-        assertNotEquals(trainee2.hashCode(), trainee3.hashCode());
+        assertEquals(hashCode1, hashCode2);
     }
 
     @Test
-    void testTraineeGettersAndSetters() {
+    void allArgsConstructorTest() {
+        Long traineeId = 1L;
+        String firstName = "John";
+        String lastName = "Doe";
+        String address = "123 Main St";
+        String password = "password123";
+        String userName = "john.doe";
+        Date dateOfBirth = new Date();
+        Boolean isActive = true;
+
         Trainee trainee = new Trainee();
-
-        Long traineeId = 1L;
-        Date dateOfBirth = new Date();
-        String address = "123 Main St";
-        User user = new User();
-
         trainee.setId(traineeId);
-        trainee.setDateOfBirth(dateOfBirth);
+        trainee.setFirstName(firstName);
+        trainee.setLastName(lastName);
         trainee.setAddress(address);
-        trainee.setUser(user);
+        trainee.setPassword(password);
+        trainee.setUserName(userName);
+        trainee.setDateOfBirth(dateOfBirth);
+        trainee.setIsActive(isActive);
 
         assertEquals(traineeId, trainee.getId());
-        assertEquals(dateOfBirth, trainee.getDateOfBirth());
+        assertEquals(firstName, trainee.getFirstName());
+        assertEquals(lastName, trainee.getLastName());
         assertEquals(address, trainee.getAddress());
-        assertEquals(user, trainee.getUser());
+        assertEquals(password, trainee.getPassword());
+        assertEquals(userName, trainee.getUserName());
+        assertEquals(dateOfBirth, trainee.getDateOfBirth());
+        assertEquals(isActive, trainee.getIsActive());
     }
+
     @Test
-    void testTraineeAllArgsConstructor() {
+    void getterSetterTest() {
+        // Arrange
         Long traineeId = 1L;
-        Date dateOfBirth = new Date();
+        String firstName = "John";
+        String lastName = "Doe";
         String address = "123 Main St";
-        User user = new User();
+        String password = "password123";
+        String userName = "john.doe";
+        Date dateOfBirth = new Date();
+        Boolean isActive = true;
 
-        Trainee trainee = new Trainee(traineeId, dateOfBirth, address, user);
+        Trainee trainee = new Trainee();
+        trainee.setId(traineeId);
+        trainee.setFirstName(firstName);
+        trainee.setLastName(lastName);
+        trainee.setAddress(address);
+        trainee.setPassword(password);
+        trainee.setUserName(userName);
+        trainee.setDateOfBirth(dateOfBirth);
+        trainee.setIsActive(isActive);
 
-        assertNotNull(trainee);
         assertEquals(traineeId, trainee.getId());
-        assertEquals(dateOfBirth, trainee.getDateOfBirth());
+        assertEquals(firstName, trainee.getFirstName());
+        assertEquals(lastName, trainee.getLastName());
         assertEquals(address, trainee.getAddress());
-        assertEquals(user, trainee.getUser());
+        assertEquals(password, trainee.getPassword());
+        assertEquals(userName, trainee.getUserName());
+        assertEquals(dateOfBirth, trainee.getDateOfBirth());
+        assertEquals(isActive, trainee.getIsActive());
     }
-
 }
 

@@ -1,5 +1,8 @@
 package org.gym.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.Conditions;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -14,6 +17,13 @@ public class AppConfig {
     @Value("${file.path}")
     private String filePath;
 
+    private ObjectMapper objectMapper;
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
     @Bean
     public String getFilePath() {
         return filePath;
@@ -27,5 +37,15 @@ public class AppConfig {
         return passwordLength;
     }
 
+
+    @Bean
+    public ModelMapper modelMapper() {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setFullTypeMatchingRequired(true);
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
+        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+        modelMapper.getConfiguration().setSkipNullEnabled(true);
+        return modelMapper;
+    }
 
 }

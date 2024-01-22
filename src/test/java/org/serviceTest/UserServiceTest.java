@@ -1,9 +1,10 @@
 package org.serviceTest;
 
-import org.gym.dao.UserDAO;
+import org.gym.dao.TraineeDAO;
+import org.gym.dao.TrainerDAO;
+import org.gym.memory.InMemoryStorage;
 import org.gym.model.User;
 import org.gym.service.UserService;
-import org.gym.utils.Generate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,11 +22,15 @@ import static org.mockito.Mockito.*;
 
 class UserServiceTest {
 
-    @Mock
-    private UserDAO userDAO;
 
     @Mock
-    private Generate generate;
+    private InMemoryStorage storage;
+
+    @Mock
+    private TraineeDAO traineeDAO;
+
+    @Mock
+    private TrainerDAO trainerDAO;
 
     @InjectMocks
     private UserService userService;
@@ -33,73 +38,50 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        when(generate.generateUniqueId(anyString())).thenReturn(1L);
-        when(generate.generatePassword()).thenReturn("mockedPassword");
-        when(userDAO.findByUserName(anyString(), anyString())).thenReturn(Optional.empty());
     }
 
     @Test
-    void testCreateUser() {
-        // Given
-        User newUser = User.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .build();
+    void generateUsernameForTraineeTest() {
+        String nameSpace = "Trainee";
+        String baseUsername = "testUser";
 
-        when(generate.generateUniqueId(anyString())).thenReturn(1L);
-        when(generate.generatePassword()).thenReturn("mockedPassword");
-        when(userDAO.save(anyString(), any(User.class))).thenReturn(newUser);
+        when(traineeDAO.findByUsername(eq(nameSpace), anyString())).thenReturn(Optional.empty());
 
-        User createdUser = userService.createUser(newUser);
+        String username = userService.generateUsernameFor(nameSpace, baseUsername);
 
-        assertNotNull(createdUser.getId());
-        assertEquals("mockedPassword", createdUser.getPassword());
-        assertNotNull(createdUser.getUserName());
-        verify(userDAO).save("User", newUser);
+        assertNotNull(username);
+        assertTrue(username.startsWith(baseUsername));
+        verify(traineeDAO, atLeastOnce()).findByUsername(eq(nameSpace), anyString());
     }
 
     @Test
-    void testSelectUser() {
-        Long userId = 1L;
-        User mockedUser = User.builder()
-                .id(userId)
-                .firstName("John")
-                .lastName("Doe")
-                .build();
+    void generateUsernameForTrainerTest() {
+        String nameSpace = "Trainer";
+        String baseUsername = "testUser";
 
-        when(userDAO.get(anyString(), anyLong())).thenReturn(mockedUser);
+        when(trainerDAO.findByUsername(eq(nameSpace), anyString())).thenReturn(Optional.empty());
 
-        User selectedUser = userService.selectUser(userId);
+        String username = userService.generateUsernameFor(nameSpace, baseUsername);
 
-        assertEquals(mockedUser, selectedUser);
-        verify(userDAO).get("User", userId);
+        assertNotNull(username);
+        assertTrue(username.startsWith(baseUsername));
+        verify(trainerDAO, atLeastOnce()).findByUsername(eq(nameSpace), anyString());
     }
 
     @Test
-    void testUpdateUser() {
-        // Given
-        Long userId = 1L;
-        User updatedUser = User.builder()
-                .id(userId)
-                .firstName("UpdatedFirstName")
-                .lastName("UpdatedLastName")
-                .build();
+    void generateUsernameForTest() {
+        String nameSpace = "Unknown";
+        String baseUsername = "testUser";
 
-        when(userDAO.update(anyString(), anyLong(), any(User.class))).thenReturn(updatedUser);
-
-        User result = userService.updateUser(userId, updatedUser);
-
-        assertEquals(updatedUser, result);
-        verify(userDAO).update("User", userId, updatedUser);
+        assertThrows(RuntimeException.class, () -> userService.generateUsernameFor(nameSpace, baseUsername));
     }
 
     @Test
-    void testDeleteUser() {
-        Long userId = 1L;
+    void generatePasswordTest() {
+        String password = userService.generatePassword();
 
-        userService.deleteUser(userId);
-
-        verify(userDAO).delete("User", userId);
+        assertNotNull(password);
+        assertEquals(10, password.length());
+        assertTrue(password.matches("[A-Za-z0-9]+"));
     }
 }

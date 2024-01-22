@@ -2,7 +2,7 @@ package org.gym.service;
 
 import org.gym.dao.TrainingDAO;
 import org.gym.model.Training;
-import org.gym.utils.Generate;
+import org.gym.utils.GenerateId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -16,12 +16,12 @@ public class TrainingService {
     private final TraineeService traineeService;
     private final String nameSpace = "Training";
 
-    private final Generate generate;
+    private final GenerateId generate;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainingService.class);
 
     @Autowired
-    public TrainingService(TrainingDAO trainingDAO, TrainerService trainerService, TraineeService traineeService, Generate generate) {
+    public TrainingService(TrainingDAO trainingDAO, TrainerService trainerService, TraineeService traineeService, GenerateId generate) {
         this.generate = generate;
         LOGGER.debug("Initializing TrainingService");
         this.trainingDAO = trainingDAO;

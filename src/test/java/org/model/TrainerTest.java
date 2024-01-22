@@ -9,79 +9,109 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class TrainerTest {
 
+
     @Test
-    void testTrainerBuilder() {
+    void toStringTest() {
         Long trainerId = 1L;
-        String specialization = "Fitness";
-        User user = new User(101L, "John", "Doe", "john.doe", "password", true);
+        String firstName = "John";
+        String lastName = "Doe";
+        String userName = "john.doe";
+        String password = "password123";
+        Boolean isActive = true;
+        String specialization = "Runner";
 
-        Trainer trainer = Trainer.builder()
-                .id(trainerId)
-                .specialization(specialization)
-                .user(user)
-                .build();
-
-        assertEquals(trainerId, trainer.getId());
-        assertEquals(specialization, trainer.getSpecialization());
-        assertEquals(user, trainer.getUser());
-    }
-
-    @Test
-    void testGettersAndSetters() {
         Trainer trainer = new Trainer();
-        Long trainerId = 2L;
-        String specialization = "Strength Training";
-        User user = new User(102L, "Jane", "Smith", "jane.smith", "newpassword", false);
-
         trainer.setId(trainerId);
+        trainer.setFirstName(firstName);
+        trainer.setLastName(lastName);
+        trainer.setUserName(userName);
+        trainer.setPassword(password);
+        trainer.setIsActive(isActive);
         trainer.setSpecialization(specialization);
-        trainer.setUser(user);
 
-        assertEquals(trainerId, trainer.getId());
-        assertEquals(specialization, trainer.getSpecialization());
-        assertEquals(user, trainer.getUser());
+        String expectedToString = "Trainer{" +
+                "id=" + trainerId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", isActive=" + isActive +
+                ", specialization='" + specialization + '\'' +
+                '}';
+
+        assertEquals(expectedToString, trainer.toString());
     }
 
     @Test
-    void testEqualsAndHashCode() {
-        Trainer trainer1 = new Trainer(1L, "Fitness", new User(201L, "Trainer1", "Trainer1", "trainer1", "password1", true));
-        Trainer trainer2 = new Trainer(1L, "Fitness", new User(201L, "Trainer1", "Trainer1", "trainer1", "password1", true));
-        Trainer trainer3 = new Trainer(2L, "Strength Training", new User(202L, "Trainer2", "Trainer2", "trainer2", "password2", false));
+    void hashCodeAndEqualsTest() {
+        Long trainerId = 1L;
+        String firstName = "John";
+        String lastName = "Doe";
+        String userName = "john.doe";
+        String password = "password123";
+        Boolean isActive = true;
+        String specialization = "Runner";
+
+        Trainer trainer1 = new Trainer();
+        trainer1.setId(trainerId);
+        trainer1.setFirstName(firstName);
+        trainer1.setLastName(lastName);
+        trainer1.setUserName(userName);
+        trainer1.setPassword(password);
+        trainer1.setIsActive(isActive);
+        trainer1.setSpecialization(specialization);
+
+        Trainer trainer2 = new Trainer();
+        trainer2.setId(trainerId);
+        trainer2.setFirstName(firstName);
+        trainer2.setLastName(lastName);
+        trainer2.setUserName(userName);
+        trainer2.setPassword(password);
+        trainer2.setIsActive(isActive);
+        trainer2.setSpecialization(specialization);
+
+        Trainer trainer3 = new Trainer();
+        trainer3.setId(2L);
+        trainer3.setFirstName("Jane");
+        trainer3.setLastName("Doe");
+        trainer3.setUserName("jane.doe");
+        trainer3.setPassword("password456");
+        trainer3.setIsActive(false);
+        trainer3.setSpecialization("Yoga");
+
+        int hashCode1 = trainer1.hashCode();
+        int hashCode2 = trainer2.hashCode();
 
         assertEquals(trainer1, trainer2);
-        assertEquals(trainer1.hashCode(), trainer2.hashCode());
-
         assertNotEquals(trainer1, trainer3);
-        assertNotEquals(trainer1.hashCode(), trainer3.hashCode());
+        assertEquals(hashCode1, hashCode2);
     }
 
     @Test
-    void testToString() {
+    void getterSetterTest() {
         Long trainerId = 1L;
-        String specialization = "Fitness";
-        User user = new User(201L, "Trainer1", "Trainer1", "trainer1", "password1", true);
+        String firstName = "John";
+        String lastName = "Doe";
+        String userName = "john.doe";
+        String password = "password123";
+        Boolean isActive = true;
+        String specialization = "Runner";
 
-        Trainer trainer = new Trainer(trainerId, specialization, user);
-
-        String toStringResult = trainer.toString();
-
-        assertEquals("Trainer{" +
-                "id=" + trainerId +
-                ", specialization='" + specialization + '\'' +
-                ", user=" + user +
-                '}', toStringResult);
-    }
-
-    @Test
-    void testAllArgsConstructor() {
-        Long trainerId = 3L;
-        String specialization = "Yoga";
-        User user = new User(301L, "YogaTrainer", "YogaTrainer", "yogatrainer", "yogapassword", true);
-
-        Trainer trainer = new Trainer(trainerId, specialization, user);
+        Trainer trainer = new Trainer();
+        trainer.setId(trainerId);
+        trainer.setFirstName(firstName);
+        trainer.setLastName(lastName);
+        trainer.setUserName(userName);
+        trainer.setPassword(password);
+        trainer.setIsActive(isActive);
+        trainer.setSpecialization(specialization);
 
         assertEquals(trainerId, trainer.getId());
+        assertEquals(firstName, trainer.getFirstName());
+        assertEquals(lastName, trainer.getLastName());
+        assertEquals(userName, trainer.getUserName());
+        assertEquals(password, trainer.getPassword());
+        assertEquals(isActive, trainer.getIsActive());
         assertEquals(specialization, trainer.getSpecialization());
-        assertEquals(user, trainer.getUser());
     }
 }

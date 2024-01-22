@@ -8,102 +8,58 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserTest {
 
     @Test
-    void testUserBuilder() {
-        Long userId = 1L;
-        String firstName = "John";
-        String lastName = "Doe";
-        String userName = "john.doe";
-        String password = "password";
-        Boolean isActive = true;
+    void testGetterAndSetter() {
+        User user = new User();
 
-        User user = User.builder()
-                .id(userId)
-                .firstName(firstName)
-                .lastName(lastName)
-                .userName(userName)
-                .password(password)
-                .isActive(isActive)
-                .build();
+        user.setId(1L);
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setUserName("john.doe");
+        user.setPassword("password123");
+        user.setIsActive(true);
 
-        assertEquals(userId, user.getId());
-        assertEquals(firstName, user.getFirstName());
-        assertEquals(lastName, user.getLastName());
-        assertEquals(userName, user.getUserName());
-        assertEquals(password, user.getPassword());
-        assertEquals(isActive, user.getIsActive());
+        assertEquals(1L, user.getId());
+        assertEquals("John", user.getFirstName());
+        assertEquals("Doe", user.getLastName());
+        assertEquals("john.doe", user.getUserName());
+        assertEquals("password123", user.getPassword());
+        assertTrue(user.getIsActive());
+    }
+
+    @Test
+    void testAllArgsConstructor() {
+        User user = new User(1L, "John", "Doe", "john.doe", "password123", true);
+
+        assertEquals(1L, user.getId());
+        assertEquals("John", user.getFirstName());
+        assertEquals("Doe", user.getLastName());
+        assertEquals("john.doe", user.getUserName());
+        assertEquals("password123", user.getPassword());
+        assertTrue(user.getIsActive());
     }
 
     @Test
     void testToString() {
-        // Given
-        Long userId = 1L;
-        String firstName = "John";
-        String lastName = "Doe";
-        String userName = "john.doe";
-        String password = "password";
-        Boolean isActive = true;
+        User user = new User(1L, "John", "Doe", "john.doe", "password123", true);
 
-        User user = new User(userId, firstName, lastName, userName, password, isActive);
-        String toStringResult = user.toString();
-
-        assertTrue(toStringResult.contains("id=" + userId));
-        assertTrue(toStringResult.contains("firstName='" + firstName + "'"));
-        assertTrue(toStringResult.contains("lastName='" + lastName + "'"));
-        assertTrue(toStringResult.contains("userName='" + userName + "'"));
-        assertTrue(toStringResult.contains("password='" + password + "'"));
-        assertTrue(toStringResult.contains("isActive=" + isActive));
-    }
-
-    @Test
-    void testGettersAndSetters() {
-        User user = new User();
-
-        Long userId = 2L;
-        String firstName = "Jane";
-        String lastName = "Smith";
-        String userName = "jane.smith";
-        String password = "newpassword";
-        Boolean isActive = false;
-
-        user.setId(userId);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setUserName(userName);
-        user.setPassword(password);
-        user.setIsActive(isActive);
-
-        assertEquals(userId, user.getId());
-        assertEquals(firstName, user.getFirstName());
-        assertEquals(lastName, user.getLastName());
-        assertEquals(userName, user.getUserName());
-        assertEquals(password, user.getPassword());
-        assertEquals(isActive, user.getIsActive());
+        assertEquals("id=1, firstName='John', lastName='Doe', userName='john.doe', password='password123', isActive=true", user.toString());
     }
 
     @Test
     void testEqualsAndHashCode() {
-        User user1 = new User(1L, "John", "Doe", "john.doe", "password", true);
-        User user2 = new User(1L, "John", "Doe", "john.doe", "password", true);
+        User user1 = new User(1L, "John", "Doe", "john.doe", "password123", true);
+        User user2 = new User(1L, "John", "Doe", "john.doe", "password123", true);
 
         assertEquals(user1, user2);
         assertEquals(user1.hashCode(), user2.hashCode());
     }
+
     @Test
-    void testAllArgsConstructor() {
-        Long userId = 3L;
-        String firstName = "Alice";
-        String lastName = "Wonderland";
-        String userName = "alice.wonderland";
-        String password = "alicepassword";
-        Boolean isActive = true;
+    void testNotEquals() {
+        User user1 = new User(1L, "John", "Doe", "john.doe", "password123", true);
+        User user2 = new User(2L, "Jane", "Doe", "jane.doe", "password456", false);
 
-        User user = new User(userId, firstName, lastName, userName, password, isActive);
-
-        assertEquals(userId, user.getId());
-        assertEquals(firstName, user.getFirstName());
-        assertEquals(lastName, user.getLastName());
-        assertEquals(userName, user.getUserName());
-        assertEquals(password, user.getPassword());
-        assertEquals(isActive, user.getIsActive());
+        assertNotEquals(user1, user2);
+        assertNotEquals(user1.hashCode(), user2.hashCode());
     }
 }

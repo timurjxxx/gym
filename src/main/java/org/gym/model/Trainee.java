@@ -13,10 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class Trainee implements Identifiable {
-    @JsonProperty("id")
-    private Long id;
+public class Trainee extends User {
 
 
     @JsonProperty("dateOfBirth")
@@ -24,15 +21,13 @@ public class Trainee implements Identifiable {
     @JsonProperty("address")
     private String address;
 
-    private User user;
+
 
     @Override
     public String toString() {
-        return "Trainee{" +
-                "id=" + id +
+        return "Trainee{" + super.toString() +
                 ", dateOfBirth=" + dateOfBirth +
                 ", address='" + address + '\'' +
-                ", user=" + user +
                 '}';
     }
 }

@@ -24,7 +24,7 @@ public class TrainingDAO {
 
     public Training get(String nameSpace,Long id) {
 
-        return (Training) storage.get(nameSpace, id);
+        return (Training) storage.findById(nameSpace, id);
     }
 
 

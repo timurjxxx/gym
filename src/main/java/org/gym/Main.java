@@ -5,9 +5,10 @@ import org.gym.config.ApplicationShutdownListener;
 import org.gym.dao.TraineeDAO;
 import org.gym.dao.TrainerDAO;
 import org.gym.dao.TrainingDAO;
-import org.gym.dao.UserDAO;
 import org.gym.memory.InMemoryStorage;
+import org.gym.model.Trainee;
 import org.gym.model.Trainer;
+import org.gym.model.Training;
 import org.gym.model.User;
 import org.gym.service.TraineeService;
 import org.gym.service.TrainerService;
@@ -21,40 +22,49 @@ public class Main {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
         InMemoryStorage storage = context.getBean(InMemoryStorage.class);
-        UserDAO userDAO = context.getBean(UserDAO.class);
-        UserService userService = context.getBean(UserService.class);
+        ApplicationShutdownListener applicationShutdownListener = context.getBean(ApplicationShutdownListener.class);
         TrainerDAO trainerDAO = context.getBean(TrainerDAO.class);
         TrainerService trainerService = context.getBean(TrainerService.class);
         TraineeDAO traineeDAO = context.getBean(TraineeDAO.class);
+        UserService userService = context.getBean(UserService.class);
         TraineeService traineeService = context.getBean(TraineeService.class);
         TrainingDAO trainingDAO = context.getBean(TrainingDAO.class);
         TrainingService trainingService = context.getBean(TrainingService.class);
-        ApplicationShutdownListener applicationShutdownListener = context.getBean(ApplicationShutdownListener.class);
-        User user = new User();
-        user.setFirstName("USer");
-        user.setLastName("JJ");
-        userService.createUser(user);
-        Trainer trainer = new Trainer();
-        trainerService.createTrainer(trainer,1L);
-        System.out.println(trainerService.selectTrainer(1L) +"HHHHHHHHHHEEEEEEEEEEEERRRRRRRRR");
 
-//        System.out.println(storage.getStorageMap().toString());
-//        User user1 = new User();
-//        user1.setFirstName("USer");
-//        user1.setLastName("JJ");
-//        userService.createUser(user1);
+        Trainee trainee = new Trainee();
+        trainee.setFirstName("Trainee");
+        trainee.setLastName("Trainee");
+        traineeService.createTrainee(trainee);
+
+
+        Trainee trainee1 = new Trainee();
+        trainee1.setFirstName("Trainee");
+        trainee1.setLastName("s");
+        traineeService.createTrainee(trainee1);
+
+        Trainee trainee2 = new Trainee();
+        trainee2.setFirstName("Trainee");
+        trainee2.setLastName("s");
+        traineeService.createTrainee(trainee2);
+
+//
 //        Trainer trainer = new Trainer();
-//        trainerService.createTrainer(trainer, 1L);
+//        trainer.setFirstName("Trainer");
+//        trainer.setLastName("Trainer");
+//        trainerService.createTrainer(trainer);
+//
+//
+//        Trainer trainer1 = new Trainer();
+//        trainer1.setFirstName("Trainer");
+//        trainer1.setLastName("Trainer");
+//        trainerService.createTrainer(trainer1);
+//
+//
 //        Trainer trainer2 = new Trainer();
-//        trainerService.createTrainer(trainer2, 1L);
-//        Trainee trainee = new Trainee();
-//        trainee.setAddress("trainer");
-//        traineeService.createTrainee(trainee, 2L);
-//        Training training = new Training();
-//        trainingService.createTraining(training, 2L, 1L);
-//        User user2 =new User();
-
+//        trainer2.setFirstName("Trainer");
+//        trainer2.setLastName("Trainer");
+//        trainerService.createTrainer(trainer2);
         System.out.println(storage.getStorageMap().toString());
-        context.close();
+
     }
 }

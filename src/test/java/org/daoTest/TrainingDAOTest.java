@@ -2,6 +2,8 @@ package org.daoTest;
 
 import org.gym.dao.TrainingDAO;
 import org.gym.memory.InMemoryStorage;
+import org.gym.model.Trainee;
+import org.gym.model.Trainer;
 import org.gym.model.Training;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,28 +29,86 @@ class TrainingDAOTest {
     }
 
     @Test
-    void testSaveTraining() {
+    void saveTest() {
         String nameSpace = "Training";
         Training training = new Training();
-        when(storage.save(anyString(), eq(training))).thenReturn(training);
+        Long trainingId = 1L;
+        Long trainerId = 10L;
+        Long traineeId = 20L;
+
+        Trainer trainer = new Trainer();
+        trainer.setId(trainerId);
+        trainer.setFirstName("John");
+        trainer.setLastName("Doe");
+        trainer.setPassword("password123");
+        trainer.setUserName("john.doe");
+        trainer.setSpecialization("Runner");
+
+        Trainee trainee = new Trainee();
+        trainee.setId(traineeId);
+        trainee.setFirstName("Alice");
+        trainee.setLastName("Smith");
+        trainee.setPassword("password456");
+        trainee.setUserName("alice.smith");
+        trainee.setIsActive(true);
+
+        training.setId(trainingId);
+        training.setTrainerId(trainer);
+        training.setTraineeId(trainee);
+
+        when(storage.save(nameSpace, training)).thenReturn(training);
 
         Training result = trainingDAO.save(nameSpace, training);
 
+        // Assert
         assertEquals(training, result);
-        verify(storage, times(1)).save(anyString(), eq(training));
+        assertEquals(trainingId, result.getId());
+        assertEquals(trainer, result.getTrainerId());
+        assertEquals(trainee, result.getTraineeId());
+
+        verify(storage).save(nameSpace, training);
     }
 
     @Test
-    void testGetTraining() {
+    void getTest() {
+        // Arrange
         String nameSpace = "Training";
         Long trainingId = 1L;
+        Long trainerId = 10L;
+        Long traineeId = 20L;
+
+        Trainer trainer = new Trainer();
+        trainer.setId(trainerId);
+        trainer.setFirstName("John");
+        trainer.setLastName("Doe");
+        trainer.setPassword("password123");
+        trainer.setUserName("john.doe");
+        trainer.setSpecialization("Runner");
+
+        Trainee trainee = new Trainee();
+        trainee.setId(traineeId);
+        trainee.setFirstName("Alice");
+        trainee.setLastName("Smith");
+        trainee.setPassword("password456");
+        trainee.setUserName("alice.smith");
+        trainee.setIsActive(true);
+
         Training expectedTraining = new Training();
-        when(storage.get(anyString(), eq(trainingId))).thenReturn(expectedTraining);
+        expectedTraining.setId(trainingId);
+        expectedTraining.setTrainerId(trainer);
+        expectedTraining.setTraineeId(trainee);
+
+        when(storage.findById(nameSpace, trainingId)).thenReturn(expectedTraining);
 
         Training result = trainingDAO.get(nameSpace, trainingId);
 
         assertEquals(expectedTraining, result);
-        verify(storage, times(1)).get(anyString(), eq(trainingId));
+        assertEquals(trainingId, result.getId());
+        assertEquals(trainer, result.getTrainerId());
+        assertEquals(trainee, result.getTraineeId());
+
+        verify(storage).findById(nameSpace, trainingId);
     }
+
 
 }

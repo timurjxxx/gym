@@ -9,8 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -28,54 +29,89 @@ class TrainerDAOTest {
     }
 
     @Test
-    void testSave() {
-        String nameSpace = "Trainer";
+    void saveTest() {
+        Long trainerId = 1L;
         Trainer newTrainer = new Trainer();
+        newTrainer.setId(trainerId);
+        newTrainer.setFirstName("John");
+        newTrainer.setLastName("Doe");
+        newTrainer.setPassword("password123");
+        newTrainer.setUserName("john.doe");
+        newTrainer.setSpecialization("Runner");
 
-        when(storage.save(eq(nameSpace), eq(newTrainer))).thenReturn(newTrainer);
+        when(storage.save("Trainer", newTrainer)).thenReturn(newTrainer);
 
-        Trainer result = trainerDAO.save(nameSpace, newTrainer);
+        Trainer result = trainerDAO.save("Trainer", newTrainer);
 
         assertEquals(newTrainer, result);
-        verify(storage, times(1)).save(eq(nameSpace), eq(newTrainer));
+        assertEquals(trainerId, result.getId());
+        assertEquals("John", result.getFirstName());
+        assertEquals("Doe", result.getLastName());
+        assertEquals("password123", result.getPassword());
+        assertEquals("john.doe", result.getUserName());
+        assertEquals("Runner", result.getSpecialization());
+        verify(storage).save("Trainer", newTrainer);
     }
 
     @Test
-    void testGet() {
-        String nameSpace = "Trainer";
+    void getTest() {
         Long trainerId = 1L;
         Trainer expectedTrainer = new Trainer();
+        expectedTrainer.setId(trainerId);
+        expectedTrainer.setFirstName("John");
+        expectedTrainer.setLastName("Doe");
+        expectedTrainer.setPassword("password123");
+        expectedTrainer.setUserName("john.doe");
+        expectedTrainer.setSpecialization("Runner");
 
-        when(storage.get(eq(nameSpace), eq(trainerId))).thenReturn(expectedTrainer);
+        when(storage.findById("Trainer", trainerId)).thenReturn(expectedTrainer);
 
-        Trainer result = trainerDAO.get(nameSpace, trainerId);
+        Trainer result = trainerDAO.get("Trainer", trainerId);
 
         assertEquals(expectedTrainer, result);
-        verify(storage, times(1)).get(eq(nameSpace), eq(trainerId));
+        assertEquals(trainerId, result.getId());
+        assertEquals("John", result.getFirstName());
+        assertEquals("Doe", result.getLastName());
+        assertEquals("password123", result.getPassword());
+        assertEquals("john.doe", result.getUserName());
+        assertEquals("Runner", result.getSpecialization());
+
+        verify(storage).findById("Trainer", trainerId);
     }
 
     @Test
-    void testDelete() {
-        String nameSpace = "Trainer";
-        Long trainerId = 1L;
+    void findByUsernameTest() {
+        // Arrange
+        String username = "testUser";
+        Trainer trainer = new Trainer();
+        trainer.setUserName(username);
+        trainer.setFirstName("John");
+        trainer.setLastName("Doe");
+        trainer.setPassword("password123");
+        trainer.setSpecialization("Runner");
 
-        trainerDAO.delete(nameSpace, trainerId);
+        when(storage.findAll("Trainer")).thenReturn(Collections.singletonList(trainer));
 
-        verify(storage, times(1)).deleteById(eq(nameSpace), eq(trainerId));
+        Optional<Trainer> result = trainerDAO.findByUsername("Trainer", username);
+
+        assertTrue(result.isPresent());
+        assertEquals(trainer, result.get());
+        assertEquals("testUser", result.get().getUserName());
+        assertEquals("John", result.get().getFirstName());
+        assertEquals("Doe", result.get().getLastName());
+        assertEquals("password123", result.get().getPassword());
+        assertEquals("Runner", result.get().getSpecialization());
+
+        verify(storage).findAll("Trainer");
     }
 
     @Test
-    void testUpdate() {
-        String nameSpace = "Trainer";
+    void deleteTest() {
         Long trainerId = 1L;
-        Trainer updatedTrainer = new Trainer();
 
-        when(storage.update(eq(nameSpace), eq(trainerId), eq(updatedTrainer))).thenReturn(updatedTrainer);
+        trainerDAO.delete("Trainer", trainerId);
 
-        Trainer result = trainerDAO.update(nameSpace, trainerId, updatedTrainer);
-
-        assertEquals(updatedTrainer, result);
-        verify(storage, times(1)).update(eq(nameSpace), eq(trainerId), eq(updatedTrainer));
+        verify(storage).deleteById("Trainer", trainerId);
     }
 
 

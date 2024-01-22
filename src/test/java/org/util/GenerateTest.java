@@ -1,13 +1,16 @@
 package org.util;
 import org.gym.memory.InMemoryStorage;
-import org.gym.model.Identifiable;
-import org.gym.utils.Generate;
+import org.gym.model.Trainee;
+import org.gym.model.Trainer;
+import org.gym.model.Training;
+import org.gym.utils.GenerateId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,11 +22,12 @@ import static org.mockito.Mockito.*;
 public class GenerateTest {
 
 
+
     @Mock
     private InMemoryStorage storage;
 
     @InjectMocks
-    private Generate generate;
+    private GenerateId generateId;
 
     @BeforeEach
     void setUp() {
@@ -31,46 +35,61 @@ public class GenerateTest {
     }
 
     @Test
-    void testGeneratePassword() {
-        String generatedPassword = generate.generatePassword();
+    void generateUniqueIdTrainerNamespaceTest() {
+        String namespace = "Trainer";
+        List<Object> trainers = new ArrayList<>();
+        Trainer trainer1 = new Trainer();
+        trainer1.setId(1L);
+        trainers.add(trainer1);
+        when(storage.getStorageMap()).thenReturn(Collections.singletonMap(namespace, trainers));
 
-        assertNotNull(generatedPassword);
-        assertEquals(10, generatedPassword.length());
+        Long generatedId = generateId.generateUniqueId(namespace);
+
+        assertEquals(2L, generatedId);
     }
 
     @Test
-    void testGenerateUniqueId() {
-        String name = "test";
-        Identifiable existingObject1 = mock(Identifiable.class);
-        Identifiable existingObject2 = mock(Identifiable.class);
-        when(existingObject1.getId()).thenReturn(1L);
-        when(existingObject2.getId()).thenReturn(2L);
+    void generateUniqueIdTraineeNamespaceTest() {
+        // Arrange
+        String namespace = "Trainee";
+        List<Object> trainees = new ArrayList<>();
+        Trainee trainee1 = new Trainee();
+        trainee1.setId(1L);
+        trainees.add(trainee1);
+        when(storage.getStorageMap()).thenReturn(Collections.singletonMap(namespace, trainees));
 
-        List<Identifiable> existingObjects = Stream.of(existingObject1, existingObject2).collect(Collectors.toList());
+        // Act
+        Long generatedId = generateId.generateUniqueId(namespace);
 
-        when(storage.getStorageMap()).thenReturn(Collections.singletonMap(name, existingObjects));
-
-        Long generatedId = generate.generateUniqueId(name);
-
-        assertEquals(3L, generatedId);
+        // Assert
+        assertEquals(2L, generatedId);
     }
+
     @Test
-    void testGenerateUniqueIdNoAvailableId() {
-        String name = "test";
-        Identifiable existingObject1 = mock(Identifiable.class);
-        Identifiable existingObject2 = mock(Identifiable.class);
-        when(existingObject1.getId()).thenReturn(1L);
-        when(existingObject2.getId()).thenReturn(2L);
+    void generateUniqueIdTrainingNamespaceTest() {
+        // Arrange
+        String namespace = "Training";
+        List<Object> trainings = new ArrayList<>();
+        Training training1 = new Training();
+        training1.setId(1L);
+        trainings.add(training1);
+        when(storage.getStorageMap()).thenReturn(Collections.singletonMap(namespace, trainings));
 
-        List<Identifiable> existingObjects = Stream.of(existingObject1, existingObject2).collect(Collectors.toList());
+        // Act
+        Long generatedId = generateId.generateUniqueId(namespace);
 
-        when(storage.getStorageMap()).thenReturn(Collections.singletonMap(name, existingObjects));
+        // Assert
+        assertEquals(2L, generatedId);
+    }
 
-        try {
-            generate.generateUniqueId(name);
-        } catch (IllegalStateException e) {
-        }
+    @Test
+    void generateUniqueIdEmptyNamespace() {
+        String namespace = "EmptyNamespace";
+        when(storage.getStorageMap()).thenReturn(Collections.emptyMap());
 
+        Long generatedId = generateId.generateUniqueId(namespace);
+
+        assertEquals(1L, generatedId);
     }
 
 }

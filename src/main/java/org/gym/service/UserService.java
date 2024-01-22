@@ -1,76 +1,75 @@
 package org.gym.service;
 
 
-import org.gym.dao.UserDAO;
-import org.gym.model.User;
-import org.gym.utils.Generate;
+import org.gym.dao.TraineeDAO;
+import org.gym.dao.TrainerDAO;
+import org.gym.memory.InMemoryStorage;
+import org.gym.model.Trainee;
+import org.gym.model.Trainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.IntUnaryOperator;
+import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.stream.IntStream;
 
 @Component
 public class UserService {
-    private final UserDAO userDAO;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-    private final String nameSpace = "User";
-    private final Generate generate;
 
+    private final InMemoryStorage storage;
+    private final TraineeDAO traineeDAO;
+    private final TrainerDAO trainerDAO;
 
     @Autowired
-    public UserService(UserDAO userDAO, Generate generate) {
-        this.userDAO = userDAO;
-        this.generate = generate;
+    public UserService(InMemoryStorage storage, TraineeDAO traineeDAO, TrainerDAO trainerDAO) {
+        this.storage = storage;
+        this.traineeDAO = traineeDAO;
+        this.trainerDAO = trainerDAO;
     }
 
-    public User selectUser(Long userId) {
-        LOGGER.debug("Selecting user with ID: {}", userId);
 
-        return userDAO.get(nameSpace,userId);
+    public String generateUsernameFor(String nameSpace, String baseUsername) {
+        LOGGER.info("Generating trainer username");
+        LOGGER.debug("Base username: {}", baseUsername);
+        if ("Trainer".equals(nameSpace)) {
+            return IntStream.iterate(1, i -> i + 1)
+                    .mapToObj(serialNumber -> baseUsername + ((serialNumber == 1) ? "" : "." + serialNumber))
+                    .filter(username -> !trainerDAO.findByUsername(nameSpace, username).isPresent())
+                    .findFirst()
+                    .orElseThrow(RuntimeException::new);
+        }if ("Trainee".equals(nameSpace)){
+
+            return IntStream.iterate(1, i -> i + 1)
+                    .mapToObj(serialNumber -> baseUsername + ((serialNumber == 1) ? "" : "." + serialNumber))
+                    .filter(username -> !traineeDAO.findByUsername(nameSpace, username).isPresent())
+                    .findFirst()
+                    .orElseThrow(RuntimeException::new);
+        }
+        return null;
     }
 
-    public User createUser(User newUser) {
-        LOGGER.info("Creating a new user");
-
-        Long userId = generate.generateUniqueId("User");
-        LOGGER.debug("Generated user ID: {}", userId);
 
 
-        newUser.setId(userId);
-        newUser.setPassword(generate.generatePassword());
-        newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
-        LOGGER.debug("Saving the new user to the database");
+    public String generatePassword() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder(10);
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            int index = random.nextInt(chars.length());
+            sb.append(chars.charAt(index));
+        }
+        LOGGER.info("Generated unique password");
+        LOGGER.debug("Generated password: {}", sb.toString());
 
-        return userDAO.save(nameSpace,newUser);
 
-    }
-
-    public String generateUsername(String username1) {
-        LOGGER.info("Generating username");
-        LOGGER.debug("Base username: {}", username1);
-        return IntStream.iterate(1, i -> i + 1)
-                .mapToObj(serialNumber -> username1 + ((serialNumber == 1) ? "" : "." + serialNumber))
-                .filter(username -> !userDAO.findByUserName(nameSpace,username).isPresent())
-                .findFirst()
-                .orElseThrow(RuntimeException::new);
-    }
-
-    public User updateUser(Long id, User updatedUser) {
-        LOGGER.info("Updating user with ID: {}", id);
-
-        updatedUser.setId(id);
-        LOGGER.debug("Updating user details: {}", updatedUser);
-
-        return userDAO.update(nameSpace,id, updatedUser);
-    }
-
-    public void deleteUser(Long id) {
-        LOGGER.debug("Retrieving training details from the database");
-
-        userDAO.delete(nameSpace,id);
+        return sb.toString();
     }
 
 
