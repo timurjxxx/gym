@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 @Component
 public class TraineeService {
 
@@ -40,9 +42,9 @@ public class TraineeService {
     public Trainee createTrainee(Trainee newTrainee) {
         LOGGER.debug("Creating new trainee");
 
-        newTrainee.setId(generateId.generateUniqueId(nameSpace));
         newTrainee.setUserName(userService.generateUsernameFor(nameSpace, newTrainee.getFirstName()) + "." + newTrainee.getLastName());
         newTrainee.setPassword(userService.generatePassword());
+        newTrainee.setId(generateId.generateUniqueId(nameSpace));
         return traineeDAO.save(nameSpace, newTrainee);
     }
 
@@ -67,6 +69,7 @@ public class TraineeService {
         LOGGER.warn("Deleting trainee with ID: {}", id);
         traineeDAO.delete(nameSpace, id);
     }
+
 
 
 }

@@ -23,48 +23,25 @@ public class Main {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
         InMemoryStorage storage = context.getBean(InMemoryStorage.class);
         ApplicationShutdownListener applicationShutdownListener = context.getBean(ApplicationShutdownListener.class);
-        TrainerDAO trainerDAO = context.getBean(TrainerDAO.class);
-        TrainerService trainerService = context.getBean(TrainerService.class);
         TraineeDAO traineeDAO = context.getBean(TraineeDAO.class);
-        UserService userService = context.getBean(UserService.class);
+        TrainerDAO trainerDAO = context.getBean(TrainerDAO.class);
         TraineeService traineeService = context.getBean(TraineeService.class);
+        TrainerService trainerService = context.getBean(TrainerService.class);
         TrainingDAO trainingDAO = context.getBean(TrainingDAO.class);
         TrainingService trainingService = context.getBean(TrainingService.class);
-
-        Trainee trainee = new Trainee();
-        trainee.setFirstName("Trainee");
-        trainee.setLastName("Trainee");
-        traineeService.createTrainee(trainee);
+        UserService userService = context.getBean(UserService.class);
 
 
-        Trainee trainee1 = new Trainee();
-        trainee1.setFirstName("Trainee");
-        trainee1.setLastName("s");
-        traineeService.createTrainee(trainee1);
+        Training training = new Training();
+        training.setTrainingName("Training");
+        trainingService.createTraining(training,trainerService.selectTrainer(1L).getId(),traineeService.selectTrainee(1L).getId());
 
-        Trainee trainee2 = new Trainee();
-        trainee2.setFirstName("Trainee");
-        trainee2.setLastName("s");
-        traineeService.createTrainee(trainee2);
 
-//
-//        Trainer trainer = new Trainer();
-//        trainer.setFirstName("Trainer");
-//        trainer.setLastName("Trainer");
-//        trainerService.createTrainer(trainer);
-//
-//
-//        Trainer trainer1 = new Trainer();
-//        trainer1.setFirstName("Trainer");
-//        trainer1.setLastName("Trainer");
-//        trainerService.createTrainer(trainer1);
-//
-//
-//        Trainer trainer2 = new Trainer();
-//        trainer2.setFirstName("Trainer");
-//        trainer2.setLastName("Trainer");
-//        trainerService.createTrainer(trainer2);
-        System.out.println(storage.getStorageMap().toString());
+
+
+
+        context.close();
+
 
     }
 }

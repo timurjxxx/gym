@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-@NoArgsConstructor
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class Trainer extends User {
 

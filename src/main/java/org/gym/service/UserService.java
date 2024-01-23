@@ -39,22 +39,22 @@ public class UserService {
         LOGGER.info("Generating trainer username");
         LOGGER.debug("Base username: {}", baseUsername);
         if ("Trainer".equals(nameSpace)) {
+
             return IntStream.iterate(1, i -> i + 1)
                     .mapToObj(serialNumber -> baseUsername + ((serialNumber == 1) ? "" : "." + serialNumber))
-                    .filter(username -> !trainerDAO.findByUsername(nameSpace, username).isPresent())
+                    .filter(username -> trainerDAO.findByUsername(nameSpace, username).isEmpty())
                     .findFirst()
                     .orElseThrow(RuntimeException::new);
         }if ("Trainee".equals(nameSpace)){
 
             return IntStream.iterate(1, i -> i + 1)
                     .mapToObj(serialNumber -> baseUsername + ((serialNumber == 1) ? "" : "." + serialNumber))
-                    .filter(username -> !traineeDAO.findByUsername(nameSpace, username).isPresent())
+                    .filter(username -> traineeDAO.findByUsername(nameSpace, username).isEmpty())
                     .findFirst()
                     .orElseThrow(RuntimeException::new);
         }
         return null;
     }
-
 
 
     public String generatePassword() {
@@ -72,7 +72,6 @@ public class UserService {
         return sb.toString();
     }
 
-
-
+//////////////////////////////////////
 
 }

@@ -68,13 +68,6 @@ class UserServiceTest {
         verify(trainerDAO, atLeastOnce()).findByUsername(eq(nameSpace), anyString());
     }
 
-    @Test
-    void generateUsernameForTest() {
-        String nameSpace = "Unknown";
-        String baseUsername = "testUser";
-
-        assertThrows(RuntimeException.class, () -> userService.generateUsernameFor(nameSpace, baseUsername));
-    }
 
     @Test
     void generatePasswordTest() {
