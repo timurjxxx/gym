@@ -25,22 +25,7 @@ public class Main {
             TraineeService traineeService = context.getBean(TraineeService.class);
             TrainingDAO trainingDAO = context.getBean(TrainingDAO.class);
             TrainingService trainingService = context.getBean(TrainingService.class);
-            User user = new User();
-            user.setFirstName("Tim");
-            user.setLastName("Rj");
-            user.setUserName("UserName");
-            user.setPassword("gamer120");
-            user.setIsActive(true);
-            User user1 = new User();
-            user.setLastName("qweqweq");
-            Trainee trainee = new Trainee();
-            trainee.setAddress("USA");
-            trainee.setDateOfBirth(new Date());
-            Training training = new Training();
-            training.setTrainingName("pullup");
-            training.setTrainingDate(new Date());
-            training.setTrainingDuration(1);
-            trainingService.addTraining(training);
+            traineeService.selectTraineeByUsername("UserName", "gameer");
         }
     }
 }
