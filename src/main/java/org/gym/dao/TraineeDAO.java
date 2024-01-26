@@ -12,4 +12,7 @@ import java.util.Optional;
 public interface TraineeDAO extends JpaRepository<Trainee, Long> {
     @Transactional(readOnly = true)
     Optional<Trainee> findTraineeByUserUserName(String username);
+
+
+    boolean  existsTraineeByUser_Id(Long id);
 }

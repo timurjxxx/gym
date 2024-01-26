@@ -6,7 +6,6 @@ import org.gym.dao.TrainerDAO;
 import org.gym.dao.UserDAO;
 import org.gym.model.Trainee;
 import org.gym.model.Trainer;
-import org.gym.model.Training;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +14,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Root;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -31,15 +36,17 @@ public class TrainerService {
     private final UserService userService;
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainerService.class);
     private final ModelMapper mapper;
+    private final EntityManager entityManager;
 
     private final TraineeDAO traineeDAO;
     private final UserDAO userDAO;
 
     @Autowired
-    public TrainerService(TrainerDAO trainerDAO, UserService userService, ModelMapper mapper, TraineeDAO traineeDAO, UserDAO userDAO) {
+    public TrainerService(TrainerDAO trainerDAO, UserService userService, ModelMapper mapper, EntityManager entityManager, TraineeDAO traineeDAO, UserDAO userDAO) {
         this.trainerDAO = trainerDAO;
         this.userService = userService;
         this.mapper = mapper;
+        this.entityManager = entityManager;
         this.traineeDAO = traineeDAO;
         this.userDAO = userDAO;
     }
@@ -48,9 +55,13 @@ public class TrainerService {
     public Trainer createTrainer(@Valid Trainer trainer, @NotNull Long userId) {
         LOGGER.info("Creating trainer with user ID: {}", userId);
         LOGGER.debug("Trainer details: {}", trainer);
+        if (trainerDAO.existsTrainerByUser_Id(userId) || traineeDAO.existsTraineeByUser_Id(userId)) {
+            throw new EntityExistsException("Trainer or Trainee with this user already exists");
+        }
         trainer.setUser(userDAO.findById(userId).orElseThrow(EntityNotFoundException::new));
         return trainerDAO.save(trainer);
     }
+
 
     @Authenticated
     @Transactional(readOnly = true)
@@ -60,22 +71,33 @@ public class TrainerService {
         LOGGER.warn("Authentication failed for trainer with username: {}", username);
         return trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
 
-
     }
 
     @Authenticated
     @Transactional
-    public Trainer updateTrainer(@NotBlank String username, @NotBlank String password, @NotNull Long id, @Valid Trainer updatedTrainer) {
+    public Trainer updateTrainer(@NotBlank String username, @NotBlank String password,  @Valid Trainer updatedTrainer) {
         LOGGER.info("Updating trainer with username: {}", username);
         LOGGER.debug("Updated trainer details: {}", updatedTrainer);
-        Trainer trainer = trainerDAO.findById(id).orElseThrow(EntityNotFoundException::new);
-        if (trainer != null) {
-            mapper.map(updatedTrainer, trainer);
-            trainer.setId(id);
-            return trainerDAO.save(updatedTrainer);
-        } else {
-            throw new EntityNotFoundException();
+
+        Long id = trainerDAO.findTrainerByUserUserName(username).get().getId();
+        // Получаем CriteriaBuilder из EntityManager
+
+
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+
+        CriteriaUpdate<Trainer> criteriaUpdate = criteriaBuilder.createCriteriaUpdate(Trainer.class);
+
+        Root<Trainer> root = criteriaUpdate.from(Trainer.class);
+
+        if (Objects.nonNull(updatedTrainer.getSpecialization())) {
+            criteriaUpdate.set(root.get("specialization"), updatedTrainer.getSpecialization());
         }
+
+        criteriaUpdate.where(criteriaBuilder.equal(root.get("id"), id));
+
+        entityManager.createQuery(criteriaUpdate).executeUpdate();
+
+        return trainerDAO.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
 

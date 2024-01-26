@@ -4,6 +4,8 @@ package org.gym.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import javax.validation.constraints.Future;
@@ -38,9 +40,9 @@ public class Training {
     @Positive(message = "Training duration must be a positive number")
     @Column(nullable = false)
     private Number trainingDuration;
-
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "training_id")
+    @Fetch(FetchMode.SELECT)
     private List<TrainingType> trainingTypes;
 
     @ManyToOne
@@ -50,5 +52,16 @@ public class Training {
     @JoinColumn(name = "trainer_id")
     private Trainer trainer;
 
-
+    @Override
+    public String toString() {
+        return "Training{" +
+                "id=" + id +
+                ", trainingName='" + trainingName + '\'' +
+                ", trainingDate=" + trainingDate +
+                ", trainingDuration=" + trainingDuration +
+                ", trainingTypes=" + trainingTypes +
+                ", trainee=" + (trainee != null ? trainee.getId() : null) +
+                ", trainer=" + (trainer != null ? trainer.getId() : null) +
+                '}';
+    }
 }

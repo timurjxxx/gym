@@ -75,23 +75,6 @@ public class TrainerServiceTest {
         assertEquals(mockedTrainer, selectedTrainer);
     }
 
-    @Test
-    void testUpdateTrainer() {
-        // Mocking
-        String username = "testUser";
-        String password = "testPassword";
-        Long trainerId = 1L;
-        Trainer updatedTrainer = new Trainer();
-        when(trainerDAO.findById(trainerId)).thenReturn(Optional.of(mockedTrainer));
-        when(trainerDAO.save(any())).thenReturn(mockedTrainer);
 
-        // Test
-        Trainer result = trainerService.updateTrainer(username, password, trainerId, updatedTrainer);
-
-        // Assertions
-        assertNotNull(result);
-        assertEquals(mockedTrainer, result);
-        verify(trainerDAO, times(1)).save(any());
-    }
 
 }

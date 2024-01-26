@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.criteria.Predicate;
 import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,63 +42,54 @@ public class TrainingService {
 
     @Transactional(readOnly = true)
     public List<Training> getTrainerTrainingsByCriteria(String trainerUsername, TrainingSearchCriteria criteria) {
-        List<Training> trainings = trainerDAO.findTrainerByUserUserName(trainerUsername)
-                .orElseThrow(() -> new EntityNotFoundException("Trainer not found")).getTraineeTrainings();
+        Trainer trainer = trainerDAO.findTrainerByUserUserName(trainerUsername)
+                .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
 
-        if (criteria != null) {
-            if (criteria.getTrainingName() != null) {
-                trainings = trainings.stream()
-                        .filter(training -> criteria.getTrainingName().equals(training.getTrainingName()))
-                        .collect(Collectors.toList());
+        return trainingDAO.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("trainer"), trainer));
+
+            if (criteria != null) {
+                if (criteria.getTrainingName() != null) {
+                    predicates.add(trainingDAO.hasTrainingName(criteria.getTrainingName()).toPredicate(root, query, cb));
+                }
+
+                if (criteria.getTrainingStartDate() != null && criteria.getTrainingEndDate() != null) {
+                    predicates.add(trainingDAO.isBetweenTrainingDates(criteria.getTrainingStartDate(), criteria.getTrainingEndDate()).toPredicate(root, query, cb));
+                }
+
+                if (criteria.getTrainingDuration() != null) {
+                    predicates.add(trainingDAO.hasTrainingDuration((Integer) criteria.getTrainingDuration()).toPredicate(root, query, cb));
+                }
             }
 
-            if (criteria.getTrainingStartDate() != null && criteria.getTrainingEndDate() != null) {
-                trainings = trainings.stream()
-                        .filter(training ->
-                                training.getTrainingDate().after(criteria.getTrainingStartDate())
-                                        && training.getTrainingDate().before(criteria.getTrainingEndDate())
-                        )
-                        .collect(Collectors.toList());
-            }
-
-            if (criteria.getTrainingDuration() != null) {
-                trainings = trainings.stream()
-                        .filter(training -> criteria.getTrainingDuration().equals(training.getTrainingDuration()))
-                        .collect(Collectors.toList());
-            }
-        }
-
-        return trainings;
+            return cb.and(predicates.toArray(new Predicate[0]));
+        });
     }
     @Transactional(readOnly = true)
     public List<Training> getTraineeTrainingsByCriteria(String traineeUsername, TrainingSearchCriteria criteria) {
-        List<Training> trainings = traineeDAO.findTraineeByUserUserName(traineeUsername)
-                .orElseThrow(() -> new EntityNotFoundException("Trainee not found")).getTraineeTrainings();
+        Trainee trainee = traineeDAO.findTraineeByUserUserName(traineeUsername)
+                .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
 
+        return trainingDAO.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("trainee"), trainee));
 
-        if (criteria != null) {
-            if (criteria.getTrainingName() != null) {
-                trainings = trainings.stream()
-                        .filter(training -> criteria.getTrainingName().equals(training.getTrainingName()))
-                        .collect(Collectors.toList());
+            if (criteria != null) {
+                if (criteria.getTrainingName() != null) {
+                    predicates.add(trainingDAO.hasTrainingName(criteria.getTrainingName()).toPredicate(root, query, cb));
+                }
+
+                if (criteria.getTrainingStartDate() != null && criteria.getTrainingEndDate() != null) {
+                    predicates.add(trainingDAO.isBetweenTrainingDates(criteria.getTrainingStartDate(), criteria.getTrainingEndDate()).toPredicate(root, query, cb));
+                }
+
+                if (criteria.getTrainingDuration() != null) {
+                    predicates.add(trainingDAO.hasTrainingDuration((Integer) criteria.getTrainingDuration()).toPredicate(root, query, cb));
+                }
             }
 
-            if (criteria.getTrainingStartDate() != null && criteria.getTrainingEndDate() != null) {
-                trainings = trainings.stream()
-                        .filter(training ->
-                                training.getTrainingDate().after(criteria.getTrainingStartDate())
-                                        && training.getTrainingDate().before(criteria.getTrainingEndDate())
-                        )
-                        .collect(Collectors.toList());
-            }
-
-            if (criteria.getTrainingDuration() != null) {
-                trainings = trainings.stream()
-                        .filter(training -> criteria.getTrainingDuration().equals(training.getTrainingDuration()))
-                        .collect(Collectors.toList());
-            }
-        }
-
-        return trainings;
+            return cb.and(predicates.toArray(new Predicate[0]));
+        });
     }
 }

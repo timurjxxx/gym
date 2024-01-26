@@ -15,4 +15,6 @@ public interface TrainerDAO extends JpaRepository<Trainer, Long> {
     @Transactional(readOnly = true)
     Optional<Trainer> findTrainerByUserUserName(String username);
     List<Trainer> findTrainerByUserIsActive (Boolean isActive);
+
+    boolean existsTrainerByUser_Id(Long id);
 }

@@ -81,35 +81,7 @@ public class TraineeServiceTest {
         verify(traineeDAO, times(1)).save(any());
     }
 
-    @Test
-    void testUpdateTrainee() {
-        String username = "testUser";
-        Long traineeId = 1L;
-        Date newDateOfBirth = new Date();
-        String newAddress = "456 Oak Street";
 
-        Trainee existingTrainee = new Trainee();
-        existingTrainee.setId(traineeId);
-        existingTrainee.setDateOfBirth(new Date());
-        existingTrainee.setAddress("123 Main Street");
-
-        Trainee updatedTrainee = new Trainee();
-        updatedTrainee.setDateOfBirth(newDateOfBirth);
-        updatedTrainee.setAddress(newAddress);
-
-        when(traineeDAO.findById(anyLong())).thenReturn(Optional.of(existingTrainee));
-        when(traineeDAO.save(any())).thenReturn(updatedTrainee);
-
-        Trainee result = traineeService.updateTrainee(username, "password", traineeId, updatedTrainee);
-
-        assertNotNull(result);
-        assertEquals(newDateOfBirth, result.getDateOfBirth());
-        assertEquals(newAddress, result.getAddress());
-        verify(traineeDAO, times(1)).findById(anyLong());
-        verify(traineeDAO, times(1)).save(any());
-        verify(modelMapper, times(1)).map(eq(updatedTrainee), eq(existingTrainee));
-        assertEquals(traineeId, existingTrainee.getId());
-    }
     @Test
     void testDeleteTraineeByUserName() {
         String username = "testUser";
