@@ -4,6 +4,7 @@ package org.gym.service;
 import org.gym.aspect.Authenticated;
 import org.gym.dao.UserDAO;
 import org.gym.model.User;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,12 @@ public class UserService {
     private UserDAO userDAO;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-
+    private final ModelMapper mapper;
 
     @Autowired
-    public UserService(UserDAO userDAO) {
+    public UserService(UserDAO userDAO, ModelMapper mapper) {
         this.userDAO = userDAO;
+        this.mapper = mapper;
     }
 
 
@@ -64,8 +66,9 @@ public class UserService {
         User existingUser = userDAO.findById(userId).orElseThrow(EntityNotFoundException::new);
 
         if (existingUser != null) {
-            updatedUser.setId(userId);
-            return userDAO.save(updatedUser);
+            mapper.map(updatedUser, existingUser);
+            existingUser.setId(userId);
+            return userDAO.save(existingUser);
         } else {
             LOGGER.warn("User with ID {} not found", userId);
             throw new RuntimeException("User with ID " + userId + " not found");
@@ -119,7 +122,7 @@ public class UserService {
     }
 
 
-    private String generateUsername(String username1) {
+     public String generateUsername(String username1) {
         LOGGER.info("Generating username");
         LOGGER.debug("Base username: {}", username1);
 
@@ -131,7 +134,7 @@ public class UserService {
                 .orElseThrow(RuntimeException::new);
     }
 
-    private String generatePassword() {
+     public String generatePassword() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder sb = new StringBuilder(10);
         Random random = new Random();
@@ -145,4 +148,7 @@ public class UserService {
 
         return sb.toString();
     }
+
+
+
 }

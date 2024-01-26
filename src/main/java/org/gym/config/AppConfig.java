@@ -1,4 +1,5 @@
 package org.gym.config;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -75,5 +76,11 @@ public class AppConfig {
         properties.setProperty("hibernate.hbm2ddl.auto", auto_sql);
 
         return properties;
+    }
+
+    @Bean
+    public ModelMapper mapper(){
+
+        return new ModelMapper();
     }
 }

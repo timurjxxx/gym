@@ -33,12 +33,14 @@ public class Training {
     @Column(nullable = false)
     private Date trainingDate;
 
+
     @NotNull(message = "Training duration cannot be null")
     @Positive(message = "Training duration must be a positive number")
     @Column(nullable = false)
     private Number trainingDuration;
 
-    @OneToMany(mappedBy = "training", cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "training_id")
     private List<TrainingType> trainingTypes;
 
     @ManyToOne

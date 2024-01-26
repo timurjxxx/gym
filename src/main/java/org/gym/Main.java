@@ -25,7 +25,6 @@ public class Main {
             TraineeService traineeService = context.getBean(TraineeService.class);
             TrainingDAO trainingDAO = context.getBean(TrainingDAO.class);
             TrainingService trainingService = context.getBean(TrainingService.class);
-            traineeService.selectTraineeByUsername("UserName", "gameer");
         }
     }
 }
