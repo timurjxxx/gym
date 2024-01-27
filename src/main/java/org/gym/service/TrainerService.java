@@ -26,16 +26,14 @@ public class TrainerService {
     private final UserService userService;
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainerService.class);
 
-    private final EntityManager entityManager;
 
     private final TraineeDAO traineeDAO;
     private final UserDAO userDAO;
 
     @Autowired
-    public TrainerService(TrainerDAO trainerDAO, UserService userService, EntityManager entityManager, TraineeDAO traineeDAO, UserDAO userDAO) {
+    public TrainerService(TrainerDAO trainerDAO, UserService userService, TraineeDAO traineeDAO, UserDAO userDAO) {
         this.trainerDAO = trainerDAO;
         this.userService = userService;
-        this.entityManager = entityManager;
         this.traineeDAO = traineeDAO;
         this.userDAO = userDAO;
     }

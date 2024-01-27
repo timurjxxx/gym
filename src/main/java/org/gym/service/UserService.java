@@ -52,25 +52,16 @@ public class UserService {
 
 
     @Transactional
-    public User updateUser(@NotNull Long userId, @Valid User updatedUser) {
+    public void updateUser(@NotNull Long userId, @Valid User updatedUser) {
 
-        User existingUser = userDAO.findById(userId).orElseThrow(EntityNotFoundException::new);
 
-        if (existingUser != null) {
-            existingUser.setId(userId);
-            return userDAO.save(existingUser);
-        } else {
-            LOGGER.warn("User with ID {} not found", userId);
-            throw new RuntimeException("User with ID " + userId + " not found");
-        }
     }
 
-    @Transactional(readOnly = true)
-    public List<User> selectAllUsers() {
-        LOGGER.info("Selecting all users");
-        return userDAO.findAll();
+    public void delete(Long id){
+        userDAO.findById(id)
+                        .orElseThrow(EntityNotFoundException::new);
+        userDAO.deleteById(id);
     }
-
 
 
     public User findUserById(@NotNull Long id) {
@@ -107,7 +98,7 @@ public class UserService {
     }
 
 
-     public String generateUsername(String username1) {
+    public String generateUsername(String username1) {
         LOGGER.info("Generating username");
         LOGGER.debug("Base username: {}", username1);
 
@@ -119,7 +110,7 @@ public class UserService {
                 .orElseThrow(RuntimeException::new);
     }
 
-     public String generatePassword() {
+    public String generatePassword() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder sb = new StringBuilder(10);
         Random random = new Random();
@@ -133,7 +124,6 @@ public class UserService {
 
         return sb.toString();
     }
-
 
 
 }

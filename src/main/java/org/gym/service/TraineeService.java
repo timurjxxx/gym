@@ -30,23 +30,19 @@ import java.util.Set;
 public class TraineeService {
 
     private final UserService userService;
-    private final ModelMapper mapper;
     private final UserDAO userDAO;
 
     private final TraineeDAO traineeDAO;
     private final TrainerDAO trainerDAO;
-    private final EntityManager entityManager;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TraineeService.class);
 
     @Autowired
-    public TraineeService(TraineeDAO traineeDAO, UserService userService, ModelMapper mapper, UserDAO userDAO, TrainerDAO trainerDAO, EntityManager entityManager) {
+    public TraineeService(TraineeDAO traineeDAO, UserService userService,  UserDAO userDAO, TrainerDAO trainerDAO) {
         this.traineeDAO = traineeDAO;
         this.userService = userService;
-        this.mapper = mapper;
         this.userDAO = userDAO;
         this.trainerDAO = trainerDAO;
-        this.entityManager = entityManager;
     }
 
     public Trainee createTrainee(Trainee trainee, Long userId) {

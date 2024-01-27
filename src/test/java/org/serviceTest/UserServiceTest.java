@@ -1,0 +1,166 @@
+package org.serviceTest;
+
+
+import org.gym.dao.UserDAO;
+import org.gym.model.User;
+import org.gym.service.UserService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+
+public class UserServiceTest {
+
+    @Mock
+    private UserDAO userDAO;
+
+
+    @InjectMocks
+    private UserService userService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+    }
+    @Test
+    void testSelectUser() {
+        // Mocking
+        Long userId = 1L;
+        User sampleUser = new User();
+        sampleUser.setId(userId);
+        sampleUser.setFirstName("John");
+        sampleUser.setLastName("Doe");
+        sampleUser.setUserName("johndoe");
+        sampleUser.setPassword("password");
+        sampleUser.setIsActive(true);
+
+        when(userDAO.findById(anyLong())).thenReturn(Optional.of(sampleUser));
+
+        User user = userService.selectUser(userId);
+
+        assertNotNull(user);
+        assertEquals(userId, user.getId());
+        verify(userDAO, times(1)).findById(anyLong());
+    }
+    @Test
+    void testCreateUser() {
+
+
+        User newUser = new User();
+        newUser.setFirstName("John");
+        newUser.setLastName("Doe");
+        newUser.setUserName("John.Doe");
+        newUser.setIsActive(true);
+
+        when(userDAO.save(any())).thenReturn(newUser);
+
+        User createdUser = userService.createUser(newUser);
+
+        assertNotNull(createdUser);
+        assertEquals("John", createdUser.getFirstName());
+        assertEquals("Doe", createdUser.getLastName());
+        assertEquals("John.Doe", createdUser.getUserName());
+        assertTrue(createdUser.getIsActive());
+    }
+
+
+    @Test
+    void testFindUserByUserName() {
+        Long userId = 1L;
+        User sampleUser = new User();
+        sampleUser.setId(userId);
+        sampleUser.setFirstName("John");
+        sampleUser.setLastName("Doe");
+        sampleUser.setUserName("johndoe");
+        sampleUser.setPassword("password");
+        sampleUser.setIsActive(true);
+
+        when(userDAO.findUserByUserName("johndoe")).thenReturn(Optional.of(sampleUser));
+
+        User foundUser = userService.findUserByUserName("johndoe");
+
+        assertNotNull(foundUser);
+        assertEquals(userId, foundUser.getId());
+        assertEquals("John", foundUser.getFirstName());
+        assertEquals("Doe", foundUser.getLastName());
+        assertEquals("johndoe", foundUser.getUserName());
+        assertEquals("password", foundUser.getPassword());
+        assertTrue(foundUser.getIsActive());
+
+        verify(userDAO, times(1)).findUserByUserName("johndoe");
+    }
+
+    @Test
+    void testChangePassword() {
+
+        String username = "testUser";
+        String newPassword = "newPassword";
+
+        User existingUser = new User();
+        existingUser.setUserName(username);
+
+        when(userDAO.findUserByUserName(eq(username))).thenReturn(Optional.of(existingUser));
+        when(userDAO.save(any())).thenReturn(existingUser);
+
+        String changedPassword = userService.changePassword(username, newPassword);
+
+        assertNotNull(changedPassword);
+        assertEquals(newPassword, changedPassword);
+        verify(userDAO, times(1)).findUserByUserName(eq(username));
+        verify(userDAO, times(1)).save(any());
+    }
+
+    @Test
+    void testChangeStatus() {
+        UserDAO userDAO = mock(UserDAO.class);
+        ModelMapper modelMapper = mock(ModelMapper.class);
+        UserService userService = new UserService(userDAO);
+
+        String username = "testUser";
+
+        User existingUser = new User();
+        existingUser.setUserName(username);
+        existingUser.setIsActive(true);
+
+        when(userDAO.findUserByUserName(eq(username))).thenReturn(Optional.of(existingUser));
+        when(userDAO.save(any())).thenReturn(existingUser);
+
+        boolean newStatus = userService.changeStatus(username);
+
+        assertFalse(newStatus);
+        verify(userDAO, times(1)).findUserByUserName(eq(username));
+        verify(userDAO, times(1)).save(any());
+    }
+
+    @Test
+    void testGenerateUsername() {
+        String baseUsername = "testUser";
+        when(userDAO.findUserByUserName(anyString())).thenReturn(Optional.empty());
+
+        String generatedUsername = userService.generateUsername(baseUsername);
+
+        assertNotNull(generatedUsername);
+        assertTrue(generatedUsername.startsWith(baseUsername));
+        verify(userDAO, atLeastOnce()).findUserByUserName(anyString());
+    }
+
+
+    @Test
+    void testGeneratePassword() {
+        String generatedPassword = userService.generatePassword();
+
+        assertNotNull(generatedPassword);
+        assertEquals(10, generatedPassword.length());
+        assertTrue(generatedPassword.matches("[A-Za-z0-9]{10}"));
+    }
+}
