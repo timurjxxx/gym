@@ -1,32 +1,27 @@
 package org.gym.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 import javax.persistence.*;
 import java.util.Objects;
-
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "user_entity")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "First name cannot be blank")
-    @Column(nullable = false)
+//    @NotBlank(message = "First name cannot be blank")
+//    @Column(nullable = false)
     private String firstName;
-    @NotBlank(message = "Last name cannot be blank")
-    @Column(nullable = false)
+//    @NotBlank(message = "Last name cannot be blank")
+//    @Column(nullable = false)
     private String lastName;
 
     private String userName;
@@ -35,10 +30,10 @@ public class User {
 
     private Boolean isActive;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Trainer trainer;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Trainee trainee;
 
     @Override

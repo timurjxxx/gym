@@ -14,26 +14,5 @@ import java.util.List;
 @Repository
 public interface TrainingDAO extends JpaRepository<Training, Long> , JpaSpecificationExecutor<Training> {
 
-    List<Training> findAll(Specification<Training> spec);
-
-    default Specification<Training> hasTraineeUsername(String username) {
-        return (root, query, cb) -> cb.equal(root.get("trainee").get("user").get("userName"), username);
-    }
-    default Specification<Training> hasTrainerUsername(String username) {
-        return (root, query, cb) -> cb.equal(root.get("trainer").get("user").get("userName"), username);
-    }
-    default Specification<Training> hasTrainingName(String trainingName) {
-        return (root, query, cb) -> cb.equal(root.get("trainingName"), trainingName);
-    }
-
-    default Specification<Training> isBetweenTrainingDates(Date startDate, Date endDate) {
-        return (root, query, cb) -> cb.between(root.get("trainingDate"), startDate, endDate);
-    }
-
-    default Specification<Training> hasTrainingDuration(Integer duration) {
-        return (root, query, cb) -> cb.equal(root.get("trainingDuration"), duration);
-    }
-
-
 
 }

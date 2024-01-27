@@ -3,7 +3,6 @@ package org.gym.service;
 import org.gym.dao.TraineeDAO;
 import org.gym.dao.TrainerDAO;
 import org.gym.dao.TrainingDAO;
-import org.gym.model.Trainee;
 import org.gym.model.Trainer;
 import org.gym.model.Training;
 import org.gym.model.TrainingSearchCriteria;
@@ -15,7 +14,6 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.Predicate;
 import javax.validation.Valid;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -34,60 +32,27 @@ public class TrainingService {
     }
 
     @Transactional
-    public Training addTraining(@Valid Training training, Long trainerId, Long traineeId) {
+    public Training addTraining( Training training, Long trainerId, Long traineeId) {
         training.setTrainer(trainerDAO.findById(trainerId).orElseThrow(EntityNotFoundException::new));
         training.setTrainee(traineeDAO.findById(traineeId).orElseThrow(EntityNotFoundException::new));
         return trainingDAO.save(training);
     }
 
-    @Transactional(readOnly = true)
     public List<Training> getTrainerTrainingsByCriteria(String trainerUsername, TrainingSearchCriteria criteria) {
         Trainer trainer = trainerDAO.findTrainerByUserUserName(trainerUsername)
-                .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Trainer not found"));
 
         return trainingDAO.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.equal(root.get("trainer"), trainer));
+            Optional.ofNullable(trainer).ifPresent(t -> predicates.add(cb.equal(root.get("trainer"), t)));
 
-            if (criteria != null) {
-                if (criteria.getTrainingName() != null) {
-                    predicates.add(trainingDAO.hasTrainingName(criteria.getTrainingName()).toPredicate(root, query, cb));
+            Optional.ofNullable(criteria).ifPresent(c -> {
+                Optional.ofNullable(c.getTrainingName()).ifPresent(v -> predicates.add(cb.equal(root.get("trainingName"), v)));
+                if (c.getTrainingStartDate() != null && c.getTrainingEndDate() != null) {
+                    predicates.add(cb.between(root.get("trainingDate"), c.getTrainingStartDate(), c.getTrainingEndDate()));
                 }
-
-                if (criteria.getTrainingStartDate() != null && criteria.getTrainingEndDate() != null) {
-                    predicates.add(trainingDAO.isBetweenTrainingDates(criteria.getTrainingStartDate(), criteria.getTrainingEndDate()).toPredicate(root, query, cb));
-                }
-
-                if (criteria.getTrainingDuration() != null) {
-                    predicates.add(trainingDAO.hasTrainingDuration((Integer) criteria.getTrainingDuration()).toPredicate(root, query, cb));
-                }
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        });
-    }
-    @Transactional(readOnly = true)
-    public List<Training> getTraineeTrainingsByCriteria(String traineeUsername, TrainingSearchCriteria criteria) {
-        Trainee trainee = traineeDAO.findTraineeByUserUserName(traineeUsername)
-                .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
-
-        return trainingDAO.findAll((root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.equal(root.get("trainee"), trainee));
-
-            if (criteria != null) {
-                if (criteria.getTrainingName() != null) {
-                    predicates.add(trainingDAO.hasTrainingName(criteria.getTrainingName()).toPredicate(root, query, cb));
-                }
-
-                if (criteria.getTrainingStartDate() != null && criteria.getTrainingEndDate() != null) {
-                    predicates.add(trainingDAO.isBetweenTrainingDates(criteria.getTrainingStartDate(), criteria.getTrainingEndDate()).toPredicate(root, query, cb));
-                }
-
-                if (criteria.getTrainingDuration() != null) {
-                    predicates.add(trainingDAO.hasTrainingDuration((Integer) criteria.getTrainingDuration()).toPredicate(root, query, cb));
-                }
-            }
+                Optional.ofNullable(c.getTrainingDuration()).ifPresent(v -> predicates.add(cb.equal(root.get("trainingDuration"), v)));
+            });
 
             return cb.and(predicates.toArray(new Predicate[0]));
         });

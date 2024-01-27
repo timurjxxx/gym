@@ -1,10 +1,9 @@
 package org.gym.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -12,32 +11,41 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.util.*;
 
-@Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@Entity
+@NamedEntityGraph(
+        name = "Trainee.fullGraph",
+        attributeNodes = {
+                @NamedAttributeNode("trainers"),
+                @NamedAttributeNode("traineeTrainings"),
+                @NamedAttributeNode(value = "user", subgraph = "user-subgraph")
+        },
+        subgraphs = @NamedSubgraph(name = "user-subgraph", attributeNodes = {})
+
+)
 public class Trainee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Date of birth cannot be null")
-    @Past(message = "Date of birth must be in the past")
-    @Column(nullable = false)
+    //    @NotNull(message = "Date of birth cannot be null")
+//    @Past(message = "Date of birth must be in the past")
+//    @Column(nullable = false)
     private Date dateOfBirth;
 
-    @NotBlank(message = "Address cannot be blank")
-    @Column(nullable = false)
+    //    @NotBlank(message = "Address cannot be blank")
+//    @Column(nullable = false)
     private String address;
 
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SELECT)
+    @ManyToMany()
     @JoinTable(
             name = "trainee_trainer",
             joinColumns = @JoinColumn(name = "trainee_id"),
@@ -45,8 +53,7 @@ public class Trainee {
     )
     private Set<Trainer> trainers = new HashSet<>();
 
-
-    @OneToMany(mappedBy = "trainee", cascade = CascadeType.REMOVE,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "trainee", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<Training> traineeTrainings;
 
 

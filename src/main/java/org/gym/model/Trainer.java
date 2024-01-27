@@ -1,40 +1,46 @@
 package org.gym.model;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
-@Entity
+@Getter
+@Setter
 @NoArgsConstructor
-@Data
-@AllArgsConstructor
-public class Trainer   {
+@Entity
+@NamedEntityGraph(
+        name = "Trainer.fullGraph",
+        attributeNodes = {
+                @NamedAttributeNode("trainees"),
+                @NamedAttributeNode("traineeTrainings"),
+                @NamedAttributeNode(value = "user", subgraph = "user-subgraph")
+        },
+        subgraphs = @NamedSubgraph(name = "user-subgraph", attributeNodes = {})
+)
+
+public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank(message = "Specialization cannot be blank")
-    @Column(nullable = false)
+    //    @NotBlank(message = "Specialization cannot be blank")
+//    @Column(nullable = false)
     private String specialization;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToMany(mappedBy = "trainers", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "trainers")
+    @Fetch(FetchMode.SUBSELECT)
     private Set<Trainee> trainees = new HashSet<>();
 
     @OneToMany(mappedBy = "trainer")
     private List<Training> traineeTrainings;
-
-
 
 
     @Override
@@ -49,6 +55,7 @@ public class Trainer   {
     public int hashCode() {
         return Objects.hash(id);
     }
+
     @Override
     public String toString() {
         return "Trainer{" +

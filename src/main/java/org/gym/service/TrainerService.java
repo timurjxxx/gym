@@ -1,9 +1,11 @@
 package org.gym.service;
 
+import lombok.val;
 import org.gym.aspect.Authenticated;
 import org.gym.dao.TraineeDAO;
 import org.gym.dao.TrainerDAO;
 import org.gym.dao.UserDAO;
+import org.gym.dto.TrainerDTO;
 import org.gym.model.Trainee;
 import org.gym.model.Trainer;
 import org.modelmapper.ModelMapper;
@@ -23,10 +25,8 @@ import javax.persistence.criteria.Root;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -35,26 +35,22 @@ public class TrainerService {
     private final TrainerDAO trainerDAO;
     private final UserService userService;
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainerService.class);
-    private final ModelMapper mapper;
+
     private final EntityManager entityManager;
 
     private final TraineeDAO traineeDAO;
     private final UserDAO userDAO;
 
     @Autowired
-    public TrainerService(TrainerDAO trainerDAO, UserService userService, ModelMapper mapper, EntityManager entityManager, TraineeDAO traineeDAO, UserDAO userDAO) {
+    public TrainerService(TrainerDAO trainerDAO, UserService userService, EntityManager entityManager, TraineeDAO traineeDAO, UserDAO userDAO) {
         this.trainerDAO = trainerDAO;
         this.userService = userService;
-        this.mapper = mapper;
         this.entityManager = entityManager;
         this.traineeDAO = traineeDAO;
         this.userDAO = userDAO;
     }
 
-    @Transactional
-    public Trainer createTrainer(@Valid Trainer trainer, @NotNull Long userId) {
-        LOGGER.info("Creating trainer with user ID: {}", userId);
-        LOGGER.debug("Trainer details: {}", trainer);
+    public Trainer createTrainer(Trainer trainer, Long userId) {
         if (trainerDAO.existsTrainerByUser_Id(userId) || traineeDAO.existsTraineeByUser_Id(userId)) {
             throw new EntityExistsException("Trainer or Trainee with this user already exists");
         }
@@ -62,78 +58,43 @@ public class TrainerService {
         return trainerDAO.save(trainer);
     }
 
+    public Trainer selectTrainerByUserName(String username) {
 
-    @Authenticated
-    @Transactional(readOnly = true)
-    public Trainer selectTrainerByUserName(@NotBlank String username, @NotBlank String password) {
-        LOGGER.info("Selecting trainer by username: {}", username);
 
-        LOGGER.warn("Authentication failed for trainer with username: {}", username);
         return trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public void updateTrainer(Long id, Trainer updatedTrainer) {
 
     }
 
-    @Authenticated
+
+    public List<Trainer> getNotAssignedActiveTrainers(String username) {
+        return trainerDAO.getNotAssignedActiveTrainers(username);
+    }
+
+
     @Transactional
-    public Trainer updateTrainer(@NotBlank String username, @NotBlank String password,  @Valid Trainer updatedTrainer) {
-        LOGGER.info("Updating trainer with username: {}", username);
-        LOGGER.debug("Updated trainer details: {}", updatedTrainer);
+    public void deleteTrainerByUserName(String username) {
 
-        Long id = trainerDAO.findTrainerByUserUserName(username).get().getId();
-        // Получаем CriteriaBuilder из EntityManager
+        trainerDAO.findTrainerByUserUserName(username)
+                .orElseThrow(EntityNotFoundException::new);
 
+        trainerDAO.deleteTrainerByUserUserName(username);
 
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-
-        CriteriaUpdate<Trainer> criteriaUpdate = criteriaBuilder.createCriteriaUpdate(Trainer.class);
-
-        Root<Trainer> root = criteriaUpdate.from(Trainer.class);
-
-        if (Objects.nonNull(updatedTrainer.getSpecialization())) {
-            criteriaUpdate.set(root.get("specialization"), updatedTrainer.getSpecialization());
-        }
-
-        criteriaUpdate.where(criteriaBuilder.equal(root.get("id"), id));
-
-        entityManager.createQuery(criteriaUpdate).executeUpdate();
-
-        return trainerDAO.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
-
-    @Authenticated
-    @Transactional(readOnly = true)
-    public List<Trainer> getNotAssignedActiveTrainers(String traineeUsername) {
-        Trainee trainee = traineeDAO.findTraineeByUserUserName(traineeUsername).orElseThrow(EntityNotFoundException::new);
-        if (trainee != null) {
-            List<Trainer> assignedTrainers = new ArrayList<>(trainee.getTrainers());
-            List<Trainer> allActiveTrainers = trainerDAO.findTrainerByUserIsActive(true);
-
-            allActiveTrainers.removeAll(assignedTrainers);
-            return allActiveTrainers;
-        }
-        return Collections.emptyList();
-    }
-
-    @Authenticated
-    @Transactional
-    public String changePassword(@NotBlank String username, @NotBlank String password, @NotBlank String newPassword) {
-        LOGGER.info("Changing password for trainer with username: {}", username);
-
-        Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
-        trainer.getUser().setPassword(userService.changePassword(username, newPassword));
-        return trainer.getUser().getPassword();
-    }
-
-    @Authenticated
-    @Transactional
-    public String changeStatus(@NotBlank String username, @NotBlank String password) {
-        LOGGER.info("Activating trainer with username: {}", username);
+    public void changeStatus(String username) {
 
         Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
         trainer.getUser().setIsActive(userService.changeStatus(username));
-        return "Activated";
     }
 
+    public void changePassword(String userName, String newPassword) {
+        Trainer trainer = trainerDAO.findTrainerByUserUserName(userName)
+                .orElseThrow(EntityNotFoundException::new);
+        trainer.getUser().setPassword(userService.changePassword(userName, newPassword));
+        trainerDAO.save(trainer);
+    }
 
 }

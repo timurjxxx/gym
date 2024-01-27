@@ -21,6 +21,7 @@ import java.util.Properties;
 @EnableAspectJAutoProxy
 @EnableJpaRepositories(basePackages = "org.gym.dao")
 @PropertySource(value = "classpath:application.properties")
+
 public class AppConfig {
 
     @Value("${spring.datasource.url}")
@@ -84,6 +85,7 @@ public class AppConfig {
 
         return new ModelMapper();
     }
+
 
 
 }

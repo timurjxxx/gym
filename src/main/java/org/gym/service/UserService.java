@@ -24,33 +24,26 @@ public class UserService {
     private UserDAO userDAO;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-    private final ModelMapper mapper;
 
     @Autowired
-    public UserService(UserDAO userDAO, ModelMapper mapper) {
+    public UserService(UserDAO userDAO) {
         this.userDAO = userDAO;
-        this.mapper = mapper;
     }
 
 
-    @Transactional(readOnly = true)
     public User selectUser(@NotBlank Long userId) {
-        LOGGER.info("Selecting user by ID: {}", userId);
         return userDAO.findById(userId).orElseThrow(EntityNotFoundException::new);
     }
 
     @Authenticated
     @Transactional(readOnly = true)
-    public User findUserByUserName(String username, String passwrod) {
-        LOGGER.info("Finding user by username: {}", username);
+    public User findUserByUserName(String username) {
         return userDAO.findUserByUserName(username).orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional
 
     public User createUser(@Valid User newUser) {
-        LOGGER.info("Creating new user");
-        LOGGER.debug("New user details: {}", newUser);
         newUser.setPassword(generatePassword());
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
 
@@ -60,13 +53,10 @@ public class UserService {
 
     @Transactional
     public User updateUser(@NotNull Long userId, @Valid User updatedUser) {
-        LOGGER.info("Updating user with ID: {}", userId);
-        LOGGER.debug("Updated user details: {}", updatedUser);
 
         User existingUser = userDAO.findById(userId).orElseThrow(EntityNotFoundException::new);
 
         if (existingUser != null) {
-            mapper.map(updatedUser, existingUser);
             existingUser.setId(userId);
             return userDAO.save(existingUser);
         } else {
@@ -81,12 +71,7 @@ public class UserService {
         return userDAO.findAll();
     }
 
-    @Transactional
-    public void deleteUserByUserName(@NotBlank String userName) {
-        LOGGER.info("Deleting user by username: {}", userName);
-        userDAO.findUserByUserName(userName).orElseThrow(EntityNotFoundException::new);
-        userDAO.deleteUserByUserName(userName);
-    }
+
 
     public User findUserById(@NotNull Long id) {
         LOGGER.info("Finding user by ID: {}", id);
