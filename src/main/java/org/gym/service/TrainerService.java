@@ -5,10 +5,7 @@ import org.gym.aspect.Authenticated;
 import org.gym.dao.TraineeDAO;
 import org.gym.dao.TrainerDAO;
 import org.gym.dao.UserDAO;
-import org.gym.dto.TrainerDTO;
-import org.gym.model.Trainee;
 import org.gym.model.Trainer;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.Root;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
