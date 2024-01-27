@@ -34,8 +34,11 @@ public class Test {
             training.setTrainingDuration(2);
             TrainingSearchCriteria criteria1 = new TrainingSearchCriteria();
             criteria1.setTrainingName("Taining");
-            List<Trainer> trainings = trainerService.getNotAssignedActiveTrainers("Trainee.777");
-            System.out.println(trainings);
+
+
+            Trainee trainee = traineeService.selectTraineeByUserName("Trainee.777");
+            System.out.println(trainee);
+
         }
     }
 }
