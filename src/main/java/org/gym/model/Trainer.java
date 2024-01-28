@@ -27,8 +27,8 @@ public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //    @NotBlank(message = "Specialization cannot be blank")
-//    @Column(nullable = false)
+    @NotBlank(message = "Specialization cannot be blank")
+    @Column(nullable = false)
     private String specialization;
 
     @OneToOne(cascade = CascadeType.REMOVE)

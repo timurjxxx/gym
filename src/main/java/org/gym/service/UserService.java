@@ -4,7 +4,6 @@ package org.gym.service;
 import org.gym.aspect.Authenticated;
 import org.gym.dao.UserDAO;
 import org.gym.model.User;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -38,6 +36,8 @@ public class UserService {
     @Authenticated
     @Transactional(readOnly = true)
     public User findUserByUserName(String username) {
+        LOGGER.info("Finding user by username: {}", username);
+
         return userDAO.findUserByUserName(username).orElseThrow(EntityNotFoundException::new);
     }
 
@@ -46,20 +46,35 @@ public class UserService {
     public User createUser(@Valid User newUser) {
         newUser.setPassword(generatePassword());
         newUser.setUserName(generateUsername(newUser.getFirstName() + "." + newUser.getLastName()));
+        User savedUser = userDAO.save(newUser);
+
+        LOGGER.info("Created user with ID: {}", savedUser.getId());
+        LOGGER.debug("Created user details: {}", savedUser);
 
         return userDAO.save(newUser);
     }
 
 
     @Transactional
-    public void updateUser(@NotNull Long userId, @Valid User updatedUser) {
-
-
+    public User updateUser(@NotNull Long userId, @Valid User updatedUser) {
+        User user = userDAO.findById(userId).orElseThrow(EntityNotFoundException::new);
+        user.setFirstName(updatedUser.getFirstName());
+        user.setLastName(updatedUser.getLastName());
+        if (!userDAO.existsUserByUserName(updatedUser.getUserName())) {
+            LOGGER.info("Updated user with ID: {}", userId);
+            LOGGER.debug("Updated user details: {}", updatedUser);
+            user.setUserName(updatedUser.getUserName());
+            return userDAO.save(user);
+        } else {
+            throw new RuntimeException("UserName is already defined");
+        }
     }
 
-    public void delete(Long id){
+    @Transactional
+    public void delete(Long id) {
         userDAO.findById(id)
-                        .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(EntityNotFoundException::new);
+        LOGGER.info("Deleting user with ID: {}", id);
         userDAO.deleteById(id);
     }
 
@@ -69,6 +84,7 @@ public class UserService {
         return userDAO.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
+    @Transactional
     public String changePassword(@NotBlank String username, @NotBlank String newPassword) {
         LOGGER.info("Changing password for user: {}", username);
 

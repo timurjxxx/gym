@@ -71,9 +71,10 @@ class TrainerServiceTest {
     @Test
     void testSelectTrainerByUserName() {
         String username = "testTrainer";
+        String password = "password";
         when(trainerDAO.findTrainerByUserUserName(username)).thenReturn(Optional.of(new Trainer()));
 
-        Trainer selectedTrainer = trainerService.selectTrainerByUserName(username);
+        Trainer selectedTrainer = trainerService.selectTrainerByUserName(username, password);
 
         assertNotNull(selectedTrainer);
 
@@ -93,17 +94,41 @@ class TrainerServiceTest {
         assertEquals(trainers.size(), result.size());
         verify(trainerDAO, times(1)).getNotAssignedActiveTrainers(username);
     }
+    @Test
+    public void testUpdateTrainer() {
+        Trainer existingTrainer = new Trainer();
+        User existingUser = new User();
+        existingUser.setUserName("existingUsername");
+        existingUser.setPassword("existingPassword");
+        existingTrainer.setUser(existingUser);
+        existingTrainer.setSpecialization("Existing Specialization");
+
+        Trainer updatedTrainer = new Trainer();
+        updatedTrainer.setSpecialization("Updated Specialization");
+
+        when(trainerDAO.findTrainerByUserUserName("existingUsername")).thenReturn(Optional.of(existingTrainer));
+        when(trainerDAO.save(existingTrainer)).thenReturn(existingTrainer);
+
+        Trainer resultTrainer = trainerService.updateTrainer("existingUsername", "existingPassword", updatedTrainer);
+
+        assertNotNull(resultTrainer);
+        assertEquals("Updated Specialization", resultTrainer.getSpecialization());
+        verify(trainerDAO, times(1)).findTrainerByUserUserName("existingUsername");
+        verify(trainerDAO, times(1)).save(existingTrainer);
+    }
 
     @Test
     void testChangePassword_Success() {
         String username = "testUser";
+        String password = "password";
+
         String newPassword = "newPassword";
         Trainer trainer = new Trainer();
         trainer.setUser(new User());
         when(trainerDAO.findTrainerByUserUserName(username)).thenReturn(Optional.of(trainer));
         when(userService.changePassword(username, newPassword)).thenReturn("encryptedPassword");
 
-        trainerService.changePassword(username, newPassword);
+        trainerService.changePassword(username,password, newPassword);
 
         assertEquals("encryptedPassword", trainer.getUser().getPassword());
         verify(trainerDAO, times(1)).findTrainerByUserUserName(username);
@@ -113,12 +138,13 @@ class TrainerServiceTest {
     @Test
     void testChangeStatus_Success() {
         String username = "testUser";
+        String password = "password";
         Trainer trainer = new Trainer();
         trainer.setUser(new User());
         when(trainerDAO.findTrainerByUserUserName(username)).thenReturn(Optional.of(trainer));
         when(userService.changeStatus(username)).thenReturn(true);
 
-        trainerService.changeStatus(username);
+        trainerService.changeStatus(username, password);
 
         assertTrue(trainer.getUser().getIsActive());
         verify(trainerDAO, times(1)).findTrainerByUserUserName(username);

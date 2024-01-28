@@ -31,13 +31,13 @@ public class Trainee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //    @NotNull(message = "Date of birth cannot be null")
-//    @Past(message = "Date of birth must be in the past")
-//    @Column(nullable = false)
+    @NotNull(message = "Date of birth cannot be null")
+    @Past(message = "Date of birth must be in the past")
+    @Column(nullable = false)
     private Date dateOfBirth;
 
-    //    @NotBlank(message = "Address cannot be blank")
-//    @Column(nullable = false)
+    @NotBlank(message = "Address cannot be blank")
+    @Column(nullable = false)
     private String address;
 
 

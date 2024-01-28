@@ -31,20 +31,20 @@ public class Training {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //    @NotBlank(message = "Training name cannot be blank")
-    //    @Column(nullable = false)
+    @NotBlank(message = "Training name cannot be blank")
+    @Column(nullable = false)
     private String trainingName;
 
-    //    @NotNull(message = "Training date cannot be null")
-    //    @Future(message = "Training date must be in the future")
-    //    @Temporal(TemporalType.TIMESTAMP)
-    //    @Column(nullable = false)
+    @NotNull(message = "Training date cannot be null")
+    @Future(message = "Training date must be in the future")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
     private Date trainingDate;
 
 
-    //    @NotNull(message = "Training duration cannot be null")
-    //    @Positive(message = "Training duration must be a positive number")
-    //    @Column(nullable = false)
+    @NotNull(message = "Training duration cannot be null")
+    @Positive(message = "Training duration must be a positive number")
+    @Column(nullable = false)
     private Number trainingDuration;
     @OneToMany()
     @JoinColumn(name = "training_id")

@@ -6,6 +6,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.gym.dao.UserDAO;
 import org.gym.model.User;
+import org.gym.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityNotFoundException;
@@ -15,6 +18,8 @@ import javax.persistence.EntityNotFoundException;
 public class AuthenticationAspect {
 
     private final UserDAO userDAO;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationAspect.class);
     public AuthenticationAspect(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
@@ -22,7 +27,8 @@ public class AuthenticationAspect {
     @Before("@within(org.gym.aspect.Authenticated) || @annotation(org.gym.aspect.Authenticated)")
     public void authenticate(JoinPoint joinPoint) {
 
-        System.out.println("Authentication aspect is invoked.");
+        LOGGER.info("Authentication aspect is invoked.");
+
 
         Object[] args = joinPoint.getArgs();
         if (args.length >= 2 &&
@@ -35,9 +41,12 @@ public class AuthenticationAspect {
             User user = userDAO.findUserByUserName(username).orElseThrow(EntityNotFoundException::new);
 
             if (user == null || !user.getPassword().equals(password)) {
-                throw new SecurityException("Authentication failed");
+                LOGGER.warn("Authentication failed for user: {}", username);
+
+                throw new SecurityException("Invalid username or password");
             }
         } else {
+            LOGGER.error("Method requires at least two String parameters for authentication.");
             throw new IllegalArgumentException("Method requires at least two String parameters for authentication.");
         }
     }

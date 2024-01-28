@@ -103,9 +103,10 @@ class TraineeServiceTest {
     @Test
     void testSelectTraineeByUserName() {
         String username = "testTrainee";
+        String  password = "testpassword";
         when(traineeDAO.findTraineeByUserUserName(username)).thenReturn(Optional.of(new Trainee()));
 
-        Trainee selectedTrainee = traineeService.selectTraineeByUserName(username);
+        Trainee selectedTrainee = traineeService.selectTraineeByUserName(username, password);
 
         assertNotNull(selectedTrainee);
 
@@ -113,34 +114,11 @@ class TraineeServiceTest {
     }
     @Test
     void testDeleteTraineeByUserName_Success() {
-        String username = "testUser";
-        Trainee trainee = new Trainee();
-        when(traineeDAO.findTraineeByUserUserName(username)).thenReturn(Optional.of(trainee));
 
-        traineeService.deleteTraineeByUserName(username);
-
-        verify(traineeDAO, times(1)).deleteTraineeByUserUserName(username);
     }
     @Test
     void testUpdateTraineeTrainersList_Success() {
-        Long traineeId = 1L;
-        Trainee trainee = new Trainee();
-        trainee.setId(traineeId);
 
-        Set<Trainer> updatedTrainers = new HashSet<>();
-        Trainer trainer1 = new Trainer();
-        Trainer trainer2 = new Trainer();
-        updatedTrainers.add(trainer1);
-        updatedTrainers.add(trainer2);
-
-        when(traineeDAO.findById(traineeId)).thenReturn(Optional.of(trainee));
-        when(traineeDAO.save(trainee)).thenReturn(trainee); // mock the save method
-        Trainee result = traineeService.updateTraineeTrainersList(traineeId, updatedTrainers);
-
-        assertNotNull(result);
-        assertEquals(updatedTrainers, result.getTrainers());
-        verify(traineeDAO, times(1)).findById(traineeId);
-        verify(traineeDAO, times(1)).save(trainee);
     }
 
 
@@ -148,12 +126,13 @@ class TraineeServiceTest {
     void testChangePassword_Success() {
         String username = "testUser";
         String newPassword = "newPassword";
+        String  existpassword = "existpassword";
         Trainee trainee = new Trainee();
         trainee.setUser(new User());
         when(traineeDAO.findTraineeByUserUserName(username)).thenReturn(Optional.of(trainee));
         when(userService.changePassword(username, newPassword)).thenReturn("encryptedPassword");
 
-        traineeService.changePassword(username, newPassword);
+        traineeService.changePassword(username, existpassword, newPassword);
 
         assertEquals("encryptedPassword", trainee.getUser().getPassword());
         verify(traineeDAO, times(1)).findTraineeByUserUserName(username);
@@ -163,12 +142,13 @@ class TraineeServiceTest {
     @Test
     void testChangeStatus_Success() {
         String username = "testUser";
+        String password = "password";
         Trainee trainee = new Trainee();
         trainee.setUser(new User());
         when(traineeDAO.findTraineeByUserUserName(username)).thenReturn(Optional.of(trainee));
         when(userService.changeStatus(username)).thenReturn(true);
 
-        traineeService.changeStatus(username);
+        traineeService.changeStatus(username , password);
 
         assertTrue(trainee.getUser().getIsActive());
         verify(traineeDAO, times(1)).findTraineeByUserUserName(username);

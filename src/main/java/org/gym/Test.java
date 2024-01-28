@@ -15,6 +15,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
+
 public class Test {
 
     public static void main(String[] args) {
@@ -28,17 +29,11 @@ public class Test {
             TrainingDAO trainingDAO = context.getBean(TrainingDAO.class);
             TrainingService trainingService = context.getBean(TrainingService.class);
 
-            Training training = new Training();
-            training.setTrainingDate(new Date());
-            training.setTrainingName("Taining");
-            training.setTrainingDuration(2);
-            TrainingSearchCriteria criteria1 = new TrainingSearchCriteria();
-            criteria1.setTrainingName("Taining");
-
-
-            Trainee trainee = traineeService.selectTraineeByUserName("Trainee.777");
-            System.out.println(trainee);
-
+            User user = new User();
+            user.setFirstName("Tom");
+            user.setLastName("Jerry");
+            user.setUserName("User.");
+            userService.updateUser(1L,user);
         }
     }
 }

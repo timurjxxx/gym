@@ -1,6 +1,5 @@
 package org.gym.service;
 
-import lombok.val;
 import org.gym.aspect.Authenticated;
 import org.gym.dao.TraineeDAO;
 import org.gym.dao.TrainerDAO;
@@ -14,8 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityExistsException;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 
@@ -25,7 +25,6 @@ public class TrainerService {
     private final TrainerDAO trainerDAO;
     private final UserService userService;
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainerService.class);
-
 
     private final TraineeDAO traineeDAO;
     private final UserDAO userDAO;
@@ -38,51 +37,71 @@ public class TrainerService {
         this.userDAO = userDAO;
     }
 
+    @Transactional
     public Trainer createTrainer(Trainer trainer, Long userId) {
         if (trainerDAO.existsTrainerByUser_Id(userId) || traineeDAO.existsTraineeByUser_Id(userId)) {
             throw new EntityExistsException("Trainer or Trainee with this user already exists");
         }
         trainer.setUser(userDAO.findById(userId).orElseThrow(EntityNotFoundException::new));
+        LOGGER.info("Created new trainer ");
         return trainerDAO.save(trainer);
     }
 
-    public Trainer selectTrainerByUserName(String username) {
-
-
+    @Authenticated
+    @Transactional(readOnly = true)
+    public Trainer selectTrainerByUserName(String username, String password) {
         return trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
     }
 
-    public void updateTrainer(Long id, Trainer updatedTrainer) {
+    @Authenticated
+    @Transactional
+    public Trainer updateTrainer(@NotBlank String usernmae, @NotBlank String password, @Valid Trainer updatedTrainer) {
+        Trainer trainer = trainerDAO.findTrainerByUserUserName(usernmae).orElseThrow(EntityNotFoundException::new);
 
+        trainer.setSpecialization(updatedTrainer.getSpecialization());
+        LOGGER.info("Updated trainer");
+        return trainerDAO.save(trainer);
     }
 
-
-    public List<Trainer> getNotAssignedActiveTrainers(String username) {
+    @Transactional(readOnly = true)
+    public List<Trainer> getNotAssignedActiveTrainers(@NotBlank String username) {
         return trainerDAO.getNotAssignedActiveTrainers(username);
     }
 
-
+    @Authenticated
     @Transactional
-    public void deleteTrainerByUserName(String username) {
+    public void deleteTrainerByUserName(@NotBlank String username, @NotBlank String password) {
 
         trainerDAO.findTrainerByUserUserName(username)
                 .orElseThrow(EntityNotFoundException::new);
-
+        LOGGER.info("Deleted trainer");
         trainerDAO.deleteTrainerByUserUserName(username);
 
     }
 
-    public void changeStatus(String username) {
+
+    @Authenticated
+    @Transactional
+    public void changeStatus(@NotBlank String username, @NotBlank String password) {
 
         Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(EntityNotFoundException::new);
         trainer.getUser().setIsActive(userService.changeStatus(username));
+        LOGGER.info("Changed status for trainer with ID: ");
+        LOGGER.debug("Updated trainer details: ");
     }
 
-    public void changePassword(String userName, String newPassword) {
+
+    @Authenticated
+    @Transactional
+    public void changePassword(@NotBlank String userName, @NotBlank String password, @NotBlank String newPassword) {
         Trainer trainer = trainerDAO.findTrainerByUserUserName(userName)
                 .orElseThrow(EntityNotFoundException::new);
         trainer.getUser().setPassword(userService.changePassword(userName, newPassword));
         trainerDAO.save(trainer);
+
+        LOGGER.info("Changed password for trainer ");
+        LOGGER.debug("Updated trainer details: ");
+
     }
 
 }

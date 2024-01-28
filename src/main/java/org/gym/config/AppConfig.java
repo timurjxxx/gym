@@ -80,12 +80,5 @@ public class AppConfig {
         return properties;
     }
 
-    @Bean
-    public ModelMapper mapper(){
-
-        return new ModelMapper();
-    }
-
-
 
 }

@@ -7,14 +7,14 @@ import org.gym.model.Trainee;
 import org.gym.model.Trainer;
 import org.gym.model.Training;
 import org.gym.model.TrainingSearchCriteria;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.Predicate;
-import javax.validation.Valid;
 import java.util.*;
 
 
@@ -25,6 +25,7 @@ public class TrainingService {
     private final TrainingDAO trainingDAO;
     private final TrainerDAO trainerDAO;
     private final TraineeDAO traineeDAO;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingService.class);
 
     @Autowired
     public TrainingService(TrainingDAO trainingDAO, TrainerDAO trainerDAO, TraineeDAO traineeDAO) {
@@ -34,9 +35,13 @@ public class TrainingService {
     }
 
     @Transactional
-    public Training addTraining( Training training, Long trainerId, Long traineeId) {
+    public Training addTraining(Training training, Long trainerId, Long traineeId) {
         training.setTrainer(trainerDAO.findById(trainerId).orElseThrow(EntityNotFoundException::new));
         training.setTrainee(traineeDAO.findById(traineeId).orElseThrow(EntityNotFoundException::new));
+
+        LOGGER.info("Added training");
+        LOGGER.debug("Added training details: ");
+
         return trainingDAO.save(training);
     }
 
@@ -59,6 +64,7 @@ public class TrainingService {
             return cb.and(predicates.toArray(new Predicate[0]));
         });
     }
+
     public List<Training> getTraineeTrainingsByCriteria(String traineeUsername, TrainingSearchCriteria criteria) {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(traineeUsername)
                 .orElseThrow(() -> new EntityNotFoundException("Trainer not found"));

@@ -17,18 +17,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @NotBlank(message = "First name cannot be blank")
-//    @Column(nullable = false)
+    @NotBlank(message = "First name cannot be blank")
+    @Column(nullable = false)
     private String firstName;
-//    @NotBlank(message = "Last name cannot be blank")
-//    @Column(nullable = false)
+    @NotBlank(message = "Last name cannot be blank")
+    @Column(nullable = false)
     private String lastName;
 
     private String userName;
 
     private String password;
 
+    @NotBlank(message = "Status cannot be blank")
+    @Column(nullable = false)
     private Boolean isActive;
+
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Trainer trainer;
