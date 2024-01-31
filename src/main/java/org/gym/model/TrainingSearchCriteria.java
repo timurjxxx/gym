@@ -12,7 +12,15 @@ public class TrainingSearchCriteria {
     private String trainingName;
     private Date trainingStartDate;
     private Date trainingEndDate;
-    private Number trainingDuration;
+    private Integer trainingDuration;
 
-
+    @Override
+    public String toString() {
+        return "TrainingSearchCriteria{" +
+                "trainingName='" + trainingName + '\'' +
+                ", trainingStartDate=" + trainingStartDate +
+                ", trainingEndDate=" + trainingEndDate +
+                ", trainingDuration=" + trainingDuration +
+                '}';
+    }
 }

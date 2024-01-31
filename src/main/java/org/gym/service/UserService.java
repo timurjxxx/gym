@@ -30,7 +30,7 @@ public class UserService {
 
 
     public User selectUser(@NotBlank Long userId) {
-        return userDAO.findById(userId).orElseThrow(EntityNotFoundException::new);
+        return userDAO.findById(userId).orElseThrow(() -> new EntityNotFoundException("User is not found"));
     }
 
     @Authenticated
@@ -79,10 +79,6 @@ public class UserService {
     }
 
 
-    public User findUserById(@NotNull Long id) {
-        LOGGER.info("Finding user by ID: {}", id);
-        return userDAO.findById(id).orElseThrow(EntityNotFoundException::new);
-    }
 
     @Transactional
     public String changePassword(@NotBlank String username, @NotBlank String newPassword) {

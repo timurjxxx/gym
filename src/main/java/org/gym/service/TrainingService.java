@@ -3,11 +3,7 @@ package org.gym.service;
 import org.gym.dao.TraineeDAO;
 import org.gym.dao.TrainerDAO;
 import org.gym.dao.TrainingDAO;
-import org.gym.dao.TrainingTypeDAO;
-import org.gym.model.Trainee;
-import org.gym.model.Trainer;
-import org.gym.model.Training;
-import org.gym.model.TrainingSearchCriteria;
+import org.gym.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,20 +23,23 @@ public class TrainingService {
     private final TrainerDAO trainerDAO;
     private final TraineeDAO traineeDAO;
 
+    private final TrainingTypeService trainingTypeService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainingService.class);
 
     @Autowired
-    public TrainingService(TrainingDAO trainingDAO, TrainerDAO trainerDAO, TraineeDAO traineeDAO) {
+    public TrainingService(TrainingDAO trainingDAO, TrainerDAO trainerDAO, TraineeDAO traineeDAO, TrainingTypeService trainingTypeService) {
         this.trainingDAO = trainingDAO;
         this.trainerDAO = trainerDAO;
         this.traineeDAO = traineeDAO;
+        this.trainingTypeService = trainingTypeService;
     }
 
     @Transactional
-    public Training addTraining(Training training, Long trainerId, Long traineeId) {
+    public Training addTraining(Training training, Long trainerId, Long traineeId , Long trainingTypeId) {
         training.setTrainer(trainerDAO.findById(trainerId).orElseThrow(EntityNotFoundException::new));
         training.setTrainee(traineeDAO.findById(traineeId).orElseThrow(EntityNotFoundException::new));
+        training.setTrainingTypes(trainingTypeService.getTrainingType(trainingTypeId));
         LOGGER.info("Added training");
         LOGGER.debug("Added training details: ");
 
@@ -69,7 +68,7 @@ public class TrainingService {
 
     public List<Training> getTraineeTrainingsByCriteria(String traineeUsername, TrainingSearchCriteria criteria) {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(traineeUsername)
-                .orElseThrow(() -> new EntityNotFoundException("Trainer not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
 
         return trainingDAO.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -86,5 +85,7 @@ public class TrainingService {
             return cb.and(predicates.toArray(new Predicate[0]));
         });
     }
+
+
 
 }

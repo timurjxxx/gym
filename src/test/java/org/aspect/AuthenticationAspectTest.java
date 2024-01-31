@@ -3,6 +3,7 @@ package org.aspect;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.gym.aspect.AuthenticationAspect;
+import org.gym.config.AppConfig;
 import org.gym.dao.UserDAO;
 import org.gym.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,9 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import javax.persistence.EntityNotFoundException;
+import javax.sql.DataSource;
 
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -73,5 +79,18 @@ public class AuthenticationAspectTest {
         assertThrows(IllegalArgumentException.class, () -> authenticationAspect.authenticate(joinPoint));
 
         verify(userDAO, never()).findUserByUserName(anyString());
+    }
+
+    @Test
+    public void testEntityManagerFactory() throws SQLException {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+
+        AppConfig appConfig = context.getBean(AppConfig.class);
+        DataSource mockDataSource = mock(DataSource.class);
+
+        when(mockDataSource.getConnection()).thenReturn(null);
+
+        assertNotNull(appConfig.entityManagerFactory(mockDataSource));
+
     }
 }

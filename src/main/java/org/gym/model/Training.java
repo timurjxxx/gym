@@ -41,11 +41,11 @@ public class Training {
     @Column(nullable = false)
     private Date trainingDate;
 
-
     @NotNull(message = "Training duration cannot be null")
     @Positive(message = "Training duration must be a positive number")
-    @Column(nullable = false)
-    private Number trainingDuration;
+    @Column(nullable = false, columnDefinition = "NUMERIC")
+    private Integer trainingDuration;
+
     @ManyToOne
     @JoinColumn(name = "training_type_id")
     private TrainingType trainingTypes;
@@ -64,7 +64,7 @@ public class Training {
                 ", trainingName='" + trainingName + '\'' +
                 ", trainingDate=" + trainingDate +
                 ", trainingDuration=" + trainingDuration +
-                ", trainingTypes=" + (trainingTypes != null ? trainingTypes.getId() : null) +
+                ", trainingTypes=" + (trainingTypes != null ? trainingTypes.getTrainingTypeName() : null) +
                 ", trainee=" + (trainee != null ? trainee.getId() : null) +
                 ", trainer=" + (trainer != null ? trainer.getId() : null) +
                 '}';

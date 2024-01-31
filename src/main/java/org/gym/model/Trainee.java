@@ -81,4 +81,6 @@ public class Trainee {
                 ", trainersCount=" + (trainers != null ? trainers.size() : 0) +
                 '}';
     }
+
+
 }

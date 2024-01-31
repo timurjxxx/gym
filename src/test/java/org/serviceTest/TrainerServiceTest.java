@@ -67,6 +67,11 @@ class TrainerServiceTest {
         verify(traineeDAO, times(1)).existsTraineeByUser_Id(userId);
         verify(userDAO, times(1)).findById(userId);
         verify(trainerDAO, times(1)).save(any(Trainer.class));
+
+        assertDoesNotThrow(() -> {
+            Trainer result = trainerService.createTrainer(trainer, userId);
+            assertNotNull(result);
+        });
     }
     @Test
     void testSelectTrainerByUserName() {

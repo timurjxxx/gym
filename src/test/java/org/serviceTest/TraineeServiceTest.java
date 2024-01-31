@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -112,15 +113,68 @@ class TraineeServiceTest {
 
         verify(traineeDAO, times(1)).findTraineeByUserUserName(username);
     }
-    @Test
-    void testDeleteTraineeByUserName_Success() {
 
+
+
+    @Test
+    void testUpdateTrainee() {
+        String username = "john.doe";
+        String password = "password";
+
+        Trainee existingTrainee = new Trainee();
+        existingTrainee.setId(1L);
+        existingTrainee.setDateOfBirth(new Date());
+        existingTrainee.setAddress("123 Main St");
+
+        Trainee updatedTrainee = new Trainee();
+        updatedTrainee.setDateOfBirth(new Date());
+        updatedTrainee.setAddress("456 Oak St");
+
+        when(traineeDAO.findTraineeByUserUserName(username)).thenReturn(Optional.of(existingTrainee));
+        when(traineeDAO.save(any(Trainee.class))).thenAnswer(invocation -> {
+            Trainee savedTrainee = invocation.getArgument(0);
+            return savedTrainee;
+        });
+
+        Trainee result = traineeService.updateTrainee(username, password, updatedTrainee);
+
+        assertNotNull(result);
+        assertEquals(updatedTrainee.getDateOfBirth(), result.getDateOfBirth());
+        assertEquals(updatedTrainee.getAddress(), result.getAddress());
+
+        verify(traineeDAO, times(1)).findTraineeByUserUserName(username);
+        verify(traineeDAO, times(1)).save(any(Trainee.class));
     }
     @Test
-    void testUpdateTraineeTrainersList_Success() {
+    void testUpdateTraineeTrainersList() {
+        String username = "john.doe";
+        String password = "password";
 
+        Trainee existingTrainee = new Trainee();
+        existingTrainee.setId(1L);
+
+        Set<Trainer> updatedList = new HashSet<>();
+        Trainer trainer1 = new Trainer();
+        trainer1.setId(1L);
+        Trainer trainer2 = new Trainer();
+        trainer2.setId(2L);
+        updatedList.add(trainer1);
+        updatedList.add(trainer2);
+
+        when(traineeDAO.findTraineeByUserUserName(username)).thenReturn(Optional.of(existingTrainee));
+        when(traineeDAO.save(any(Trainee.class))).thenAnswer(invocation -> {
+            Trainee savedTrainee = invocation.getArgument(0);
+            return savedTrainee;
+        });
+
+        Trainee result = traineeService.updateTraineeTrainersList(username, password, updatedList);
+
+        assertNotNull(result);
+        assertEquals(updatedList, result.getTrainers());
+
+        verify(traineeDAO, times(1)).findTraineeByUserUserName(username);
+        verify(traineeDAO, times(1)).save(any(Trainee.class));
     }
-
 
     @Test
     void testChangePassword_Success() {

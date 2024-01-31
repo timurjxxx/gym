@@ -25,18 +25,18 @@ import java.util.Properties;
 public class AppConfig {
 
     @Value("${spring.datasource.url}")
-    public String url;
+    private String url;
 
     @Value("${spring.datasource.driverClassName}")
-    public String className;
+    private String className;
 
 
     @Value("${spring.datasource.username}")
-    public String username;
+    private String username;
 
 
     @Value("${spring.datasource.password}")
-    public String password;
+    private String password;
 
     @Value("${hibernate.dialect}")
     private String hibernateDialect;
@@ -45,7 +45,8 @@ public class AppConfig {
     private String show_sql;
 
     @Value("${hibernate.hbm2ddl.auto}")
-    private String auto_sql;
+    private
+    String auto_sql;
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();

@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -98,6 +99,68 @@ public class UserServiceTest {
         assertTrue(foundUser.getIsActive());
 
         verify(userDAO, times(1)).findUserByUserName("johndoe");
+    }
+
+
+    @Test
+    void testUpdateUser() {
+        Long userId = 1L;
+        User existingUser = new User();
+        existingUser.setId(userId);
+        existingUser.setFirstName("John");
+        existingUser.setLastName("Doe");
+        existingUser.setUserName("john.doe");
+        existingUser.setPassword("password");
+
+        User updatedUser = new User();
+        updatedUser.setFirstName("Updated");
+        updatedUser.setLastName("User");
+        updatedUser.setUserName("updated.user");
+        updatedUser.setPassword("password");
+
+        when(userDAO.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userDAO.existsUserByUserName(updatedUser.getUserName())).thenReturn(false);
+        when(userDAO.save(any(User.class))).thenReturn(updatedUser);
+
+        User result = userService.updateUser(userId, updatedUser);
+
+        assertNotNull(result);
+        assertEquals(updatedUser.getFirstName(), result.getFirstName());
+        assertEquals(updatedUser.getLastName(), result.getLastName());
+        assertEquals(updatedUser.getUserName(), result.getUserName());
+
+        verify(userDAO, times(1)).findById(userId);
+        verify(userDAO, times(1)).existsUserByUserName(updatedUser.getUserName());
+        verify(userDAO, times(1)).save(any(User.class));
+    }
+    @Test
+    void testDeleteWithNonExistingUser() {
+        Long nonExistentUserId = 999L;
+
+        when(userDAO.findById(nonExistentUserId)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> userService.delete(nonExistentUserId));
+
+        verify(userDAO, times(1)).findById(nonExistentUserId);
+        verify(userDAO, never()).deleteById(any());
+    }
+
+    @Test
+    void testDelete() {
+        Long userId = 1L;
+        User existingUser = new User();
+        existingUser.setId(userId);
+        existingUser.setFirstName("John");
+        existingUser.setLastName("Doe");
+        existingUser.setUserName("john.doe");
+        existingUser.setPassword("password");
+
+        when(userDAO.findById(userId)).thenReturn(Optional.of(existingUser));
+
+        assertDoesNotThrow(() -> userService.delete(userId));
+
+        verify(userDAO, times(1)).findById(userId);
+        verify(userDAO, times(1)).deleteById(userId);
     }
 
     @Test
