@@ -19,8 +19,7 @@ public class TrainingType {
     @Enumerated(EnumType.STRING)
     private TrainingTypeEnum trainingTypeName;
 
-    @ManyToOne
-    private Training training;
+
 
 
 }

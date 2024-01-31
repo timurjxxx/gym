@@ -3,6 +3,7 @@ package org.gym.service;
 import org.gym.dao.TraineeDAO;
 import org.gym.dao.TrainerDAO;
 import org.gym.dao.TrainingDAO;
+import org.gym.dao.TrainingTypeDAO;
 import org.gym.model.Trainee;
 import org.gym.model.Trainer;
 import org.gym.model.Training;
@@ -25,6 +26,8 @@ public class TrainingService {
     private final TrainingDAO trainingDAO;
     private final TrainerDAO trainerDAO;
     private final TraineeDAO traineeDAO;
+
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainingService.class);
 
     @Autowired
@@ -38,7 +41,6 @@ public class TrainingService {
     public Training addTraining(Training training, Long trainerId, Long traineeId) {
         training.setTrainer(trainerDAO.findById(trainerId).orElseThrow(EntityNotFoundException::new));
         training.setTrainee(traineeDAO.findById(traineeId).orElseThrow(EntityNotFoundException::new));
-
         LOGGER.info("Added training");
         LOGGER.debug("Added training details: ");
 

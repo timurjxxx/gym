@@ -46,9 +46,9 @@ public class Training {
     @Positive(message = "Training duration must be a positive number")
     @Column(nullable = false)
     private Number trainingDuration;
-    @OneToMany()
-    @JoinColumn(name = "training_id")
-    private List<TrainingType> trainingTypes;
+    @ManyToOne
+    @JoinColumn(name = "training_type_id")
+    private TrainingType trainingTypes;
 
     @ManyToOne
     @JoinColumn(name = "trainee_id")
@@ -64,7 +64,7 @@ public class Training {
                 ", trainingName='" + trainingName + '\'' +
                 ", trainingDate=" + trainingDate +
                 ", trainingDuration=" + trainingDuration +
-                ", trainingTypes=" + (trainingTypes != null ? trainingTypes.size() : 0) +
+                ", trainingTypes=" + (trainingTypes != null ? trainingTypes.getId() : null) +
                 ", trainee=" + (trainee != null ? trainee.getId() : null) +
                 ", trainer=" + (trainer != null ? trainer.getId() : null) +
                 '}';

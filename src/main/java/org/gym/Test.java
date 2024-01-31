@@ -29,11 +29,7 @@ public class Test {
             TrainingDAO trainingDAO = context.getBean(TrainingDAO.class);
             TrainingService trainingService = context.getBean(TrainingService.class);
 
-            User user = new User();
-            user.setFirstName("Tom");
-            user.setLastName("Jerry");
-            user.setUserName("User.");
-            userService.updateUser(1L,user);
+
         }
     }
 }
