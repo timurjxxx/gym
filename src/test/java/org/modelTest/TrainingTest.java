@@ -81,4 +81,5 @@ public class TrainingTest {
         assertNotEquals(training1.hashCode(), training3.hashCode());
     }
 
+
 }
