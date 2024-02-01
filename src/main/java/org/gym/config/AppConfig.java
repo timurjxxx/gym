@@ -19,6 +19,7 @@ import java.util.Properties;
 @ComponentScan(basePackages = "org.gym")
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
+
 @EnableJpaRepositories(basePackages = "org.gym.dao")
 @PropertySource(value = "classpath:application.properties")
 
