@@ -36,12 +36,12 @@ public class TrainingService {
     }
 
     @Transactional
-    public Training addTraining(Training training, Long trainerId, Long traineeId , Long trainingTypeId) {
+    public Training addTraining(Training training, Long trainerId, Long traineeId, Long trainingTypeId) {
         training.setTrainer(trainerDAO.findById(trainerId).orElseThrow(EntityNotFoundException::new));
         training.setTrainee(traineeDAO.findById(traineeId).orElseThrow(EntityNotFoundException::new));
         training.setTrainingTypes(trainingTypeService.getTrainingType(trainingTypeId));
-        LOGGER.info("Added training");
-        LOGGER.debug("Added training details: ");
+        LOGGER.info("Added training with trainer id{} nad trainee id{} annd trainingtype id {}", trainerId, traineeId, trainingTypeId);
+        LOGGER.debug("Added training details: {}", training);
 
         return trainingDAO.save(training);
     }
@@ -49,6 +49,9 @@ public class TrainingService {
     public List<Training> getTrainerTrainingsByCriteria(String trainerUsername, TrainingSearchCriteria criteria) {
         Trainer trainer = trainerDAO.findTrainerByUserUserName(trainerUsername)
                 .orElseThrow(() -> new EntityNotFoundException("Trainer not found"));
+        LOGGER.info("Get trainer with username: {}", trainerUsername);
+        LOGGER.debug("Trainer details: {}", trainer);
+        LOGGER.debug("Criterie details: {}", criteria);
 
         return trainingDAO.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -70,6 +73,10 @@ public class TrainingService {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(traineeUsername)
                 .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
 
+        LOGGER.info("Get trainee with username: {}", traineeUsername);
+        LOGGER.debug("Trainee details: {}", trainee);
+        LOGGER.debug("Criterie details: {}", criteria);
+
         return trainingDAO.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             Optional.ofNullable(trainee).ifPresent(t -> predicates.add(cb.equal(root.get("trainee"), t)));
@@ -85,7 +92,6 @@ public class TrainingService {
             return cb.and(predicates.toArray(new Predicate[0]));
         });
     }
-
 
 
 }
