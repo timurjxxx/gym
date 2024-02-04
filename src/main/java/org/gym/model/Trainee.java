@@ -1,5 +1,6 @@
 package org.gym.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -9,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
+import java.time.LocalDate;
 import java.util.*;
 
 @Getter
@@ -34,16 +36,18 @@ public class Trainee {
     @NotNull(message = "Date of birth cannot be null")
     @Past(message = "Date of birth must be in the past")
     @Column(nullable = false)
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @NotBlank(message = "Address cannot be blank")
     @Column(nullable = false)
     private String address;
 
+    @JsonIgnore
 
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     private User user;
+    @JsonIgnore
 
     @ManyToMany()
     @JoinTable(
@@ -52,6 +56,7 @@ public class Trainee {
             inverseJoinColumns = @JoinColumn(name = "trainer_id")
     )
     private Set<Trainer> trainers = new HashSet<>();
+    @JsonIgnore
 
     @OneToMany(mappedBy = "trainee", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<Training> traineeTrainings;

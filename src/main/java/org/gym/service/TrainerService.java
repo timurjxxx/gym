@@ -49,15 +49,13 @@ public class TrainerService {
         return trainerDAO.save(trainer);
     }
 
-    @Authenticated
     @Transactional(readOnly = true)
-    public Trainer selectTrainerByUserName(String username, String password) {
+    public Trainer selectTrainerByUserName(String username) {
         LOGGER.info("Find trainer with username:{}", username);
-        LOGGER.debug("Trainer username: {}, password {}", username, password);
+        LOGGER.debug("Trainer username: {}", username);
         return trainerDAO.findTrainerByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainer with username " + username + "is not found "));
     }
 
-    @Authenticated
     @Transactional
     public Trainer updateTrainer(@NotBlank String username, @NotBlank String password, @Valid Trainer updatedTrainer) {
         Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainer with username " + username + "is not found "));
@@ -74,7 +72,6 @@ public class TrainerService {
         return trainerDAO.getNotAssignedActiveTrainers(username);
     }
 
-    @Authenticated
     @Transactional
     public void deleteTrainerByUserName(@NotBlank String username, @NotBlank String password) {
 
@@ -88,7 +85,6 @@ public class TrainerService {
     }
 
 
-    @Authenticated
     @Transactional
     public void changeStatus(@NotBlank String username, @NotBlank String password) {
 
@@ -98,7 +94,6 @@ public class TrainerService {
     }
 
 
-    @Authenticated
     @Transactional
     public void changePassword(@NotBlank String userName, @NotBlank String password, @NotBlank String newPassword) {
         Trainer trainer = trainerDAO.findTrainerByUserUserName(userName)

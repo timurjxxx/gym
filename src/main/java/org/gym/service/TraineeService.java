@@ -6,6 +6,7 @@ import org.gym.dao.TrainerDAO;
 import org.gym.dao.UserDAO;
 import org.gym.model.Trainee;
 import org.gym.model.Trainer;
+import org.gym.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Service
-public class TraineeService {
+public class    TraineeService {
 
     private final UserService userService;
     private final UserDAO userDAO;
@@ -39,52 +40,37 @@ public class TraineeService {
     }
 
     @Transactional
-    public Trainee createTrainee(@Valid Trainee trainee, @NotNull Long userId) {
-        if (trainerDAO.existsTrainerByUser_Id(userId) || traineeDAO.existsTraineeByUser_Id(userId)) {
-            throw new EntityExistsException("Trainer or Trainee with this user already exists");
-        }
-        trainee.setUser(userDAO.findById(userId).orElseThrow(() -> new EntityNotFoundException("user with id:" + userId + "not found")));
-
-        LOGGER.info("Created new trainee : {}", trainee);
-        LOGGER.debug("Created trainee details: {} , user id {}", trainee, userId);
+    public Trainee createTrainee(@Valid Trainee trainee, @NotNull User user) {
+        trainee.setUser(userService.createUser(user));
 
         return traineeDAO.save(trainee);
     }
 
-    @Authenticated
     @Transactional(readOnly = true)
-    public Trainee selectTraineeByUserName(@NotBlank String username, @NotBlank String password) {
-        LOGGER.info("Select trainee with username: {}", username);
-        LOGGER.debug("Trainer username: {}, password: {}", username, password);
+    public Trainee selectTraineeByUserName(@NotBlank String username) {
         return traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainee with username:" + username + "is not found"));
     }
 
-    @Authenticated
     @Transactional
-    public Trainee updateTrainee(@NotBlank String username, @NotBlank String password, @Valid Trainee updatedTrainee) {
+    public Trainee updateTrainee(@NotBlank String username, @Valid Trainee updatedTrainee) {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainee with username:" + username + "is not found"));
         trainee.setDateOfBirth(updatedTrainee.getDateOfBirth());
         trainee.setAddress(updatedTrainee.getAddress());
-
-        LOGGER.info("Updated trainee with userName: {} ", username);
-        LOGGER.debug("Updated trainee details: {}", updatedTrainee);
         return traineeDAO.save(trainee);
     }
 
-    @Authenticated
     @Transactional
-    public void deleteTraineeByUserName(@NotBlank String username, @NotBlank String password) {
+    public void deleteTraineeByUserName(@NotBlank String username) {
         traineeDAO.findTraineeByUserUserName(username)
                 .orElseThrow(() -> new EntityNotFoundException("Trainee with username:" + username + "is not found"));
 
         traineeDAO.deleteTraineeByUserUserName(username);
         LOGGER.info("Deleted trainee with username: {}", username);
-        LOGGER.debug("Deleted trainee with username {} , password {} ", username, password);
+        LOGGER.debug("Deleted trainee with username {}  ", username);
     }
 
-    @Authenticated
     @Transactional
-    public Trainee updateTraineeTrainersList(@NotBlank String username, @NotBlank String password, @NotBlank Set<Trainer> updatedList) {
+    public Trainee updateTraineeTrainersList(@NotBlank String username,  @NotBlank Set<Trainer> updatedList) {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainee with username:" + username + "is not found"));
 
         trainee.setTrainers(updatedList);
@@ -95,14 +81,12 @@ public class TraineeService {
 
     }
 
-    @Authenticated
     @Transactional
-    public void changePassword(@NotBlank String username, @NotBlank String password, @NotBlank String newPassword) {
+    public void changePassword(@NotBlank String username, @NotBlank String newPassword) {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainee with username:" + username + "is not found"));
         trainee.getUser().setPassword(userService.changePassword(username, newPassword));
 
         LOGGER.info("Changed password for trainee with username: {}", username);
-        LOGGER.debug("Old password {}, new password {} ", password, newPassword);
     }
 
     @Transactional

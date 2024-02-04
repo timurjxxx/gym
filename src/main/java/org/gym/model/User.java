@@ -1,11 +1,13 @@
 package org.gym.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 import javax.persistence.*;
 import java.util.Objects;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,10 +33,10 @@ public class User {
     @NotBlank(message = "Status cannot be blank")
     @Column(nullable = false)
     private Boolean isActive;
-
-
+    @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Trainer trainer;
+    @JsonIgnore
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Trainee trainee;
