@@ -1,7 +1,5 @@
 package org.gym.service;
 
-import org.gym.dao.TraineeDAO;
-import org.gym.dao.TrainerDAO;
 import org.gym.dao.TrainingDAO;
 import org.gym.model.*;
 import org.slf4j.Logger;
@@ -10,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.Predicate;
 import java.util.*;
 
@@ -20,35 +17,33 @@ public class TrainingService {
 
 
     private final TrainingDAO trainingDAO;
-    private final TrainerDAO trainerDAO;
-    private final TraineeDAO traineeDAO;
-
+    private final TrainerService trainerService;
+    private final TraineeService traineeService;
     private final TrainingTypeService trainingTypeService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainingService.class);
 
     @Autowired
-    public TrainingService(TrainingDAO trainingDAO, TrainerDAO trainerDAO, TraineeDAO traineeDAO, TrainingTypeService trainingTypeService) {
+    public TrainingService(TrainingDAO trainingDAO, TrainerService trainerService, TraineeService traineeService, TrainingTypeService trainingTypeService) {
         this.trainingDAO = trainingDAO;
-        this.trainerDAO = trainerDAO;
-        this.traineeDAO = traineeDAO;
+        this.trainerService = trainerService;
+        this.traineeService = traineeService;
         this.trainingTypeService = trainingTypeService;
     }
 
     @Transactional
-    public Training addTraining(Training training, Long trainerId, Long traineeId, Long trainingTypeId) {
-        training.setTrainer(trainerDAO.findById(trainerId).orElseThrow(EntityNotFoundException::new));
-        training.setTrainee(traineeDAO.findById(traineeId).orElseThrow(EntityNotFoundException::new));
+    public Training addTraining(Training training, String trainerName, String traineeName, Long trainingTypeId) {
+        training.setTrainer(trainerService.selectTrainerByUserName(trainerName));
+        training.setTrainee(traineeService.selectTraineeByUserName(traineeName));
         training.setTrainingTypes(trainingTypeService.getTrainingType(trainingTypeId));
-        LOGGER.info("Added training with trainer id{} nad trainee id{} annd trainingtype id {}", trainerId, traineeId, trainingTypeId);
+        LOGGER.info("Added training with trainer name {}, and trainee name {} and trainingtype id {}", trainerName, traineeName, trainingTypeId);
         LOGGER.debug("Added training details: {}", training);
 
         return trainingDAO.save(training);
     }
 
     public List<Training> getTrainerTrainingsByCriteria(String trainerUsername, TrainingSearchCriteria criteria) {
-        Trainer trainer = trainerDAO.findTrainerByUserUserName(trainerUsername)
-                .orElseThrow(() -> new EntityNotFoundException("Trainer not found"));
+        Trainer trainer = trainerService.selectTrainerByUserName(trainerUsername);
         LOGGER.info("Get trainer with username: {}", trainerUsername);
         LOGGER.debug("Trainer details: {}", trainer);
         LOGGER.debug("Criterie details: {}", criteria);
@@ -70,8 +65,7 @@ public class TrainingService {
     }
 
     public List<Training> getTraineeTrainingsByCriteria(String traineeUsername, TrainingSearchCriteria criteria) {
-        Trainee trainee = traineeDAO.findTraineeByUserUserName(traineeUsername)
-                .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
+        Trainee trainee = traineeService.selectTraineeByUserName(traineeUsername);
 
         LOGGER.info("Get trainee with username: {}", traineeUsername);
         LOGGER.debug("Trainee details: {}", trainee);

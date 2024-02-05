@@ -6,7 +6,6 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 @Getter
@@ -18,6 +17,7 @@ import java.util.*;
         attributeNodes = {
                 @NamedAttributeNode("trainees"),
                 @NamedAttributeNode("traineeTrainings"),
+                @NamedAttributeNode("specialization"),
                 @NamedAttributeNode(value = "user", subgraph = "user-subgraph")
         },
         subgraphs = @NamedSubgraph(name = "user-subgraph", attributeNodes = {})
@@ -27,9 +27,11 @@ public class Trainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank(message = "Specialization cannot be blank")
-    @Column(nullable = false)
-    private String specialization;
+
+
+    @ManyToOne
+    @JoinColumn(name = "specialization")
+    private TrainingType specialization;
 
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
@@ -58,12 +60,9 @@ public class Trainer {
 
     @Override
     public String toString() {
-        return "Trainer{" +
-                "id=" + id +
-                ", specialization='" + specialization + '\'' +
-                ", user=" + user +
-                ", traineesCount=" + (trainees != null ? trainees.size() : 0) +
-                ", traineeTrainingsCount=" + (traineeTrainings != null ? traineeTrainings.size() : 0) +
+        return "Trainer{" + user +
+                "specialization='" + specialization.getTrainingTypeName() + '\'' +
+                ", trainees list=" + (trainees != null ? trainees : 0) +
                 '}';
     }
 }

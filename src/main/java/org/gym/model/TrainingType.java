@@ -17,8 +17,7 @@ public class TrainingType {
     private Long id;
 
 
-    @Enumerated(EnumType.STRING)
-    private TrainingTypeEnum trainingTypeName;
+    private String trainingTypeName;
 
 
     @Override

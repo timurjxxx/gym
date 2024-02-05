@@ -2,9 +2,6 @@ package org.gym.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.springframework.data.jpa.repository.EntityGraph;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -42,8 +39,6 @@ public class Trainee {
     @Column(nullable = false)
     private String address;
 
-    @JsonIgnore
-
     @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     private User user;
@@ -77,13 +72,11 @@ public class Trainee {
 
     @Override
     public String toString() {
-        return "Trainee{" +
-                "id=" + id +
+        return "Trainee{" + user +
                 ", dateOfBirth=" + dateOfBirth +
                 ", address='" + address + '\'' +
-                ", user=" + user +
                 ", traineeTrainingsCount=" + (traineeTrainings != null ? traineeTrainings.size() : 0) +
-                ", trainersCount=" + (trainers != null ? trainers.size() : 0) +
+                ", trainersCount=" + (trainers != null ? trainers : 0) +
                 '}';
     }
 

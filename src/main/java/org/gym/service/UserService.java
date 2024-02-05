@@ -56,18 +56,12 @@ public class UserService {
 
 
     @Transactional
-    public User updateUser(@NotNull Long userId, @Valid User updatedUser) {
-        User user = userDAO.findById(userId).orElseThrow(EntityNotFoundException::new);
+    public User updateUser(@NotNull String userName, @Valid User updatedUser) {
+        User user = userDAO.findUserByUserName(userName).orElseThrow(EntityNotFoundException::new);
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
-        if (!userDAO.existsUserByUserName(updatedUser.getUserName())) {
-            LOGGER.info("Updated user with ID: {}", userId);
-            LOGGER.debug("Updated user details: {}", updatedUser);
-            user.setUserName(updatedUser.getUserName());
-            return userDAO.save(user);
-        } else {
-            throw new RuntimeException("UserName is already defined");
-        }
+        user.setIsActive(updatedUser.getIsActive());
+        return userDAO.save(user);
     }
 
     @Transactional
@@ -77,7 +71,6 @@ public class UserService {
         LOGGER.info("Deleting user with ID: {}", id);
         userDAO.deleteById(id);
     }
-
 
 
     @Transactional

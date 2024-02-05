@@ -1,6 +1,5 @@
 package org.gym.service;
 
-import org.gym.aspect.Authenticated;
 import org.gym.dao.TraineeDAO;
 import org.gym.dao.TrainerDAO;
 import org.gym.dao.UserDAO;
@@ -13,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -21,7 +19,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Service
-public class    TraineeService {
+public class TraineeService {
 
     private final UserService userService;
     private final UserDAO userDAO;
@@ -41,8 +39,8 @@ public class    TraineeService {
 
     @Transactional
     public Trainee createTrainee(@Valid Trainee trainee, @NotNull User user) {
-        trainee.setUser(userService.createUser(user));
 
+        trainee.setUser(userService.createUser(user));
         return traineeDAO.save(trainee);
     }
 
@@ -56,6 +54,7 @@ public class    TraineeService {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainee with username:" + username + "is not found"));
         trainee.setDateOfBirth(updatedTrainee.getDateOfBirth());
         trainee.setAddress(updatedTrainee.getAddress());
+        trainee.setUser(userService.updateUser(updatedTrainee.getUser().getUserName(), updatedTrainee.getUser()));
         return traineeDAO.save(trainee);
     }
 
@@ -70,7 +69,7 @@ public class    TraineeService {
     }
 
     @Transactional
-    public Trainee updateTraineeTrainersList(@NotBlank String username,  @NotBlank Set<Trainer> updatedList) {
+    public Trainee updateTraineeTrainersList(@NotBlank String username, @NotBlank Set<Trainer> updatedList) {
         Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainee with username:" + username + "is not found"));
 
         trainee.setTrainers(updatedList);

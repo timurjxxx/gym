@@ -1,11 +1,9 @@
 package org.gym.service;
 
-import lombok.extern.java.Log;
-import org.gym.aspect.Authenticated;
-import org.gym.dao.TraineeDAO;
 import org.gym.dao.TrainerDAO;
-import org.gym.dao.UserDAO;
 import org.gym.model.Trainer;
+import org.gym.model.TrainingType;
+import org.gym.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -27,25 +24,19 @@ public class TrainerService {
     private final UserService userService;
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainerService.class);
 
-    private final TraineeDAO traineeDAO;
-    private final UserDAO userDAO;
+    private final TrainingTypeService trainingTypeService;
 
     @Autowired
-    public TrainerService(TrainerDAO trainerDAO, UserService userService, TraineeDAO traineeDAO, UserDAO userDAO) {
+    public TrainerService(TrainerDAO trainerDAO, UserService userService, TrainingTypeService trainingTypeService) {
         this.trainerDAO = trainerDAO;
         this.userService = userService;
-        this.traineeDAO = traineeDAO;
-        this.userDAO = userDAO;
+        this.trainingTypeService = trainingTypeService;
     }
 
     @Transactional
-    public Trainer createTrainer(Trainer trainer, Long userId) {
-        if (trainerDAO.existsTrainerByUser_Id(userId) || traineeDAO.existsTraineeByUser_Id(userId)) {
-            throw new EntityExistsException("Trainer or Trainee with this user already exists");
-        }
-        trainer.setUser(userDAO.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " is not found ")));
-        LOGGER.info("Created new trainer with userId: {}", userId);
-        LOGGER.debug("New trainer details: {}", trainer);
+    public Trainer createTrainer(Trainer trainer, User user, TrainingType trainingType) {
+        trainer.setUser(userService.createUser(user));
+        trainer.setSpecialization(trainingTypeService.createTrainingType(trainingType));
         return trainerDAO.save(trainer);
     }
 
@@ -57,12 +48,11 @@ public class TrainerService {
     }
 
     @Transactional
-    public Trainer updateTrainer(@NotBlank String username, @NotBlank String password, @Valid Trainer updatedTrainer) {
+    public Trainer updateTrainer(@NotBlank String username, @Valid Trainer updatedTrainer) {
         Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainer with username " + username + "is not found "));
-
-        trainer.setSpecialization(updatedTrainer.getSpecialization());
-        LOGGER.info("Updated trainer with username: {}", updatedTrainer);
-        LOGGER.debug("Updated trainer details: {}", updatedTrainer);
+        trainer.setUser(userService.updateUser(updatedTrainer.getUser().getUserName(), updatedTrainer.getUser()));
+        LOGGER.info("Updated trainer with username: {}", username);
+//        LOGGER.debug("Updated trainer details: {}", updatedTrainer);
         return trainerDAO.save(trainer);
     }
 
@@ -72,17 +62,6 @@ public class TrainerService {
         return trainerDAO.getNotAssignedActiveTrainers(username);
     }
 
-    @Transactional
-    public void deleteTrainerByUserName(@NotBlank String username, @NotBlank String password) {
-
-        trainerDAO.findTrainerByUserUserName(username)
-                .orElseThrow(() -> new EntityNotFoundException("Trainer with username " + username + "is not found "));
-        LOGGER.info("Deleted trainer with username : {}", username);
-        LOGGER.debug("Trainer username {}, password{}", username, password);
-
-        trainerDAO.deleteTrainerByUserUserName(username);
-
-    }
 
 
     @Transactional

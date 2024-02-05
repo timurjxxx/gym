@@ -21,7 +21,6 @@ import java.util.Properties;
 @EnableWebMvc
 @EnableJpaRepositories(basePackages = "org.gym.dao")
 @PropertySource(value = "classpath:application.properties")
-
 public class AppConfig {
 
     @Value("${spring.datasource.url}")

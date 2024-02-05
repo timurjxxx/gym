@@ -33,24 +33,19 @@ public class User {
     @NotBlank(message = "Status cannot be blank")
     @Column(nullable = false)
     private Boolean isActive;
-    @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Trainer trainer;
-    @JsonIgnore
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Trainee trainee;
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
+        return  "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", userName='" + userName + '\'' +
                 ", password='" + password + '\'' +
-                ", isActive=" + isActive +
-                '}';
+                ", isActive=" + isActive + '\t';
     }
 
     @Override

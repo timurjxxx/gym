@@ -1,25 +1,15 @@
 package org.gym.controller;
 
+import io.swagger.annotations.ApiOperation;
 import org.gym.aspect.Authenticated;
-import org.gym.dao.TraineeDAO;
 import org.gym.model.Trainee;
-import org.gym.model.User;
 import org.gym.service.TraineeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-
 @RestController
 @RequestMapping(value = "/trainee", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TraineeController {
@@ -31,25 +21,17 @@ public class TraineeController {
         this.traineeService = traineeService;
     }
 
-
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createTrainee(@RequestBody Map<String, String> jsonData) {
-        Trainee trainee = new Trainee();
-        User user = new User();
-        user.setFirstName(jsonData.get("firstName"));
-        user.setLastName(jsonData.get("lastName"));
-        trainee.setAddress(jsonData.get("address"));
-        user.setIsActive(Boolean.valueOf(jsonData.get("isActive")));
+    public ResponseEntity<String> createTrainee(@RequestBody Trainee trainee) {
 
-        LocalDate date = LocalDate.parse(jsonData.get("dateOfBirth"));
-        trainee.setDateOfBirth(date);
-
-        Trainee createdTrainee = traineeService.createTrainee(trainee, user);
+        Trainee createdTrainee = traineeService.createTrainee(trainee, trainee.getUser());
         return ResponseEntity.ok("Username :" + createdTrainee.getUser().getUserName() + " Password :" + createdTrainee.getUser().getPassword());
+
     }
 
     @Authenticated
     @GetMapping("/login/{username}/{password}")
+    @ApiOperation("Create a new user")
     public ResponseEntity<Void> login(@PathVariable String username, @PathVariable String password) {
 
         Trainee trainee = traineeService.selectTraineeByUserName(username);
@@ -61,5 +43,40 @@ public class TraineeController {
         }
 
     }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<String> getTraineeProfile(@PathVariable String username) {
+
+        Trainee trainee = traineeService.selectTraineeByUserName(username);
+        if (trainee != null) {
+            return ResponseEntity.ok(trainee.toString());
+
+        } else {
+            throw new EntityNotFoundException("Not found");
+        }
+
+    }
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTraineeProfile(@RequestBody Trainee trainee) {
+        Trainee updatedTrainee = traineeService.updateTrainee(trainee.getUser().getUserName(), trainee);
+        return ResponseEntity.ok(updatedTrainee.toString());
+    }
+
+    @DeleteMapping("/{username}")
+    public ResponseEntity<Void> deleteTraineeProfile(@PathVariable String username) {
+        traineeService.deleteTraineeByUserName(username);
+        return ResponseEntity.ok().build();
+    }
+
+//    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<String> updateTraineeTrainersList(@RequestBody Map<String, Object> requestBody) {
+//        String username = (String) requestBody.get("username");
+//        Set<Map<String, Object>> trainersList = (Set<Map<String, Object>>) requestBody.get("trainers");
+//
+//
+//        Trainee updatedTrainee = traineeService.updateTraineeTrainersList(username, trainersList);
+//        return ResponseEntity.ok(updatedTrainee.toString());
+//    }
 
 }
