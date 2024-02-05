@@ -64,8 +64,9 @@ public class TrainerService {
 
 
 
+
     @Transactional
-    public void changeStatus(@NotBlank String username, @NotBlank String password) {
+    public void changeStatus(@NotBlank String username) {
 
         Trainer trainer = trainerDAO.findTrainerByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainer with username " + username + "is not found "));
         trainer.getUser().setIsActive(userService.changeStatus(username));

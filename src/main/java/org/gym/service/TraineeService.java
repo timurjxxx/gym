@@ -89,7 +89,7 @@ public class TraineeService {
     }
 
     @Transactional
-    public void changeStatus(@NotBlank String username, @NotBlank String password) {
+    public void changeStatus(@NotBlank String username) {
 
         Trainee trainee = traineeDAO.findTraineeByUserUserName(username).orElseThrow(() -> new EntityNotFoundException("Trainee with username:" + username + "is not found"));
         trainee.getUser().setIsActive(userService.changeStatus(username));

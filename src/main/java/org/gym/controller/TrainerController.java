@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/trainer", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,7 +53,7 @@ public class TrainerController {
     }
 
     @GetMapping("/list/{userName}")
-    public ResponseEntity<String> getNotAssignedActiveTrainers( @PathVariable String userName) {
+    public ResponseEntity<String> getNotAssignedActiveTrainers(@PathVariable String userName) {
 
         List<Trainer> trainer = trainerService.getNotAssignedActiveTrainers(userName);
         if (trainer != null) {
@@ -63,4 +64,11 @@ public class TrainerController {
         }
 
     }
+
+    @PatchMapping(value = "/change_status", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> activateDeactivateTrainee(@RequestBody Map<String, String> jsonData) {
+        trainerService.changeStatus(jsonData.get("username"));
+        return ResponseEntity.ok().build();
+    }
+
 }

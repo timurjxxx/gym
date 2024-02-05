@@ -3,22 +3,31 @@ package org.gym.controller;
 import io.swagger.annotations.ApiOperation;
 import org.gym.aspect.Authenticated;
 import org.gym.model.Trainee;
+import org.gym.model.Trainer;
 import org.gym.service.TraineeService;
+import org.gym.service.TrainerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 @RestController
 @RequestMapping(value = "/trainee", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TraineeController {
 
     private final TraineeService traineeService;
+    private final TrainerService trainerService;
 
     @Autowired
-    public TraineeController(TraineeService traineeService) {
+    public TraineeController(TraineeService traineeService, TrainerService trainerService) {
         this.traineeService = traineeService;
+        this.trainerService = trainerService;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -69,14 +78,22 @@ public class TraineeController {
         return ResponseEntity.ok().build();
     }
 
-//    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<String> updateTraineeTrainersList(@RequestBody Map<String, Object> requestBody) {
-//        String username = (String) requestBody.get("username");
-//        Set<Map<String, Object>> trainersList = (Set<Map<String, Object>>) requestBody.get("trainers");
-//
-//
-//        Trainee updatedTrainee = traineeService.updateTraineeTrainersList(username, trainersList);
-//        return ResponseEntity.ok(updatedTrainee.toString());
-//    }
+    @PutMapping(value = "/updateTrainersList", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTraineeTrainersList(@RequestBody Map<String, Object> jsonData) {
+        String traineeUsername = (String) jsonData.get("traineeUsername");
+        List<String> trainerUsernames = (List<String>) jsonData.get("trainerUsernames");
+        Set<Trainer> trainers = new HashSet<>();
+        for (String item : trainerUsernames) {
+            trainers.add(trainerService.selectTrainerByUserName(item));
+        }
+        Trainee updatedTrainee = traineeService.updateTraineeTrainersList(traineeUsername, trainers);
+        return ResponseEntity.ok(updatedTrainee.toString());
+    }
+
+    @PatchMapping(value = "/change_status", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> activateDeactivateTrainee(@RequestBody Map<String, String> jsonData) {
+        traineeService.changeStatus(jsonData.get("username"));
+        return ResponseEntity.ok().build();
+    }
 
 }
