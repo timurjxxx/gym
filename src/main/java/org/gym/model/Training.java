@@ -1,6 +1,8 @@
 package org.gym.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -43,6 +45,7 @@ public class Training {
     private Integer trainingDuration;
 
     @ManyToOne
+//    @JsonIgnore  // Исключить поле из процесса сериализации
     @JoinColumn(name = "training_type_id")
     private TrainingType trainingTypes;
 
@@ -61,8 +64,8 @@ public class Training {
                 ", trainingDate=" + trainingDate +
                 ", trainingDuration=" + trainingDuration +
                 ", trainingTypes=" + (trainingTypes != null ? trainingTypes.getTrainingTypeName() : null) +
-                ", trainee=" + (trainee != null ? trainee.getId() : null) +
-                ", trainer=" + (trainer != null ? trainer.getId() : null) +
+                ", trainee=" + (trainee != null ? trainee.getUser().getUserName() : null) +
+                ", trainer=" + (trainer != null ? trainer.getUser().getUserName() : null) +
                 '}';
     }
 

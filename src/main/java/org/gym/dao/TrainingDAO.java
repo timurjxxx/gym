@@ -20,4 +20,5 @@ public interface TrainingDAO extends JpaRepository<Training, Long> , JpaSpecific
 
 
 
+
 }

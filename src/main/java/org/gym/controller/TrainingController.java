@@ -29,28 +29,33 @@ public class TrainingController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createTraining(@RequestBody Training training) {
+    public ResponseEntity<Void> createTraining(@RequestBody Training training) {
 
         String trainerName = training.getTrainer().getUser().getUserName();
         String traineeName = training.getTrainee().getUser().getUserName();
         String trainingTypeName = training.getTrainingTypes().getTrainingTypeName();
-        Training training1 = trainingService.addTraining(training, trainerName, traineeName, trainingTypeName);
-        return ResponseEntity.ok(training.toString());
+        trainingService.addTraining(training, trainerName, traineeName, trainingTypeName);
+        return ResponseEntity.ok().build();
 
     }
 
     @GetMapping(value = "/trainee/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Training>> getTraineeTrainingsByCriteria(@PathVariable String username, @RequestBody TrainingSearchCriteria criteria) {
+    public ResponseEntity<String> getTraineeTrainingsByCriteria(@PathVariable String username, @RequestBody TrainingSearchCriteria criteria) {
 
         List<Training> trainings = trainingService.getTraineeTrainingsByCriteria(username, criteria);
-        return ResponseEntity.ok(trainings);
-    }
-
-    @GetMapping(value = "/trainer/{username}")
-    public ResponseEntity<List<Training>> getTrainerTrainingsByCriteria() {
-        return null;
+        return ResponseEntity.ok(trainings.toString());
 
     }
+
+    @GetMapping(value = "/trainer/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getTrainerTrainingsByCriteria(@PathVariable String username, @RequestBody TrainingSearchCriteria criteria) {
+
+        List<Training> trainings = trainingService.getTrainerTrainingsByCriteria(username, criteria);
+        return ResponseEntity.ok(trainings.toString());
+
+    }
+
+
 
 
 }
