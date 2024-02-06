@@ -1,6 +1,5 @@
 package org.gym.controller;
 
-import io.swagger.annotations.ApiOperation;
 import org.gym.aspect.Authenticated;
 import org.gym.model.Trainee;
 import org.gym.model.Trainer;
@@ -39,22 +38,8 @@ public class TraineeController {
     }
 
     @Authenticated
-    @GetMapping("/login/{username}/{password}")
-    @ApiOperation("Create a new user")
-    public ResponseEntity<Void> login(@PathVariable String username, @PathVariable String password) {
-
-        Trainee trainee = traineeService.selectTraineeByUserName(username);
-        if (trainee != null) {
-            return ResponseEntity.ok().build();
-
-        } else {
-            throw new EntityNotFoundException("Not found");
-        }
-
-    }
-
-    @GetMapping("/{username}")
-    public ResponseEntity<String> getTraineeProfile(@PathVariable String username) {
+    @GetMapping("/get_Trainee/{username}/{password}")
+    public ResponseEntity<String> getTraineeProfile(@PathVariable String username, @PathVariable String password) {
 
         Trainee trainee = traineeService.selectTraineeByUserName(username);
         if (trainee != null) {
@@ -66,20 +51,23 @@ public class TraineeController {
 
     }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTraineeProfile(@RequestBody Trainee trainee) {
+    @Authenticated
+    @PutMapping(value = "/update_Trainee/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTraineeProfile(@PathVariable String username, @PathVariable String password, @RequestBody Trainee trainee) {
         Trainee updatedTrainee = traineeService.updateTrainee(trainee.getUser().getUserName(), trainee);
         return ResponseEntity.ok(updatedTrainee.toString());
     }
 
-    @DeleteMapping("/{username}")
-    public ResponseEntity<Void> deleteTraineeProfile(@PathVariable String username) {
+    @Authenticated
+    @DeleteMapping("/delete_Trainee/{username}/{password}")
+    public ResponseEntity<Void> deleteTraineeProfile(@PathVariable String username, @PathVariable String password) {
         traineeService.deleteTraineeByUserName(username);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(value = "/updateTrainersList", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTraineeTrainersList(@RequestBody Map<String, Object> jsonData) {
+    @Authenticated
+    @PutMapping(value = "/updateTrainersList/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTraineeTrainersList(@PathVariable String username, @PathVariable String password, @RequestBody Map<String, Object> jsonData) {
         String traineeUsername = (String) jsonData.get("traineeUsername");
         List<String> trainerUsernames = (List<String>) jsonData.get("trainerUsernames");
         Set<Trainer> trainers = new HashSet<>();
@@ -90,10 +78,12 @@ public class TraineeController {
         return ResponseEntity.ok(updatedTrainee.toString());
     }
 
-    @PatchMapping(value = "/change_status", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> activateDeactivateTrainee(@RequestBody Map<String, String> jsonData) {
+    @Authenticated
+    @PatchMapping(value = "/change_status/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> activateDeactivateTrainee(@PathVariable String username, @PathVariable String password, @RequestBody Map<String, String> jsonData) {
         traineeService.changeStatus(jsonData.get("username"));
         return ResponseEntity.ok().build();
     }
 
 }
+

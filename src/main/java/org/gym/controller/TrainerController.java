@@ -1,5 +1,6 @@
 package org.gym.controller;
 
+import org.gym.aspect.Authenticated;
 import org.gym.model.Trainer;
 import org.gym.service.TrainerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +27,14 @@ public class TrainerController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createTrainer(@RequestBody Trainer trainer) {
 
-        Trainer createdTrainee = trainerService.createTrainer(trainer, trainer.getUser(), trainer.getSpecialization());
+        Trainer createdTrainee = trainerService.createTrainer(trainer, trainer.getUser(), trainer.getSpecialization().getTrainingTypeName());
         return ResponseEntity.ok("Username :" + createdTrainee.getUser().getUserName() + " Password :" + createdTrainee.getUser().getPassword());
 
     }
 
-
-    @GetMapping("/{username}")
-    public ResponseEntity<String> getTrainerProfile(@PathVariable String username) {
+    @Authenticated
+    @GetMapping("/get_Trainer/{username}/{password}")
+    public ResponseEntity<String> getTrainerProfile(@PathVariable String username, @PathVariable String password) {
 
         Trainer trainer = trainerService.selectTrainerByUserName(username);
         if (trainer != null) {
@@ -45,15 +46,15 @@ public class TrainerController {
 
     }
 
-
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTrainerProfile(@RequestBody Trainer trainer) {
+    @Authenticated
+    @PutMapping(value = "/update_Trainer/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTrainerProfile(@PathVariable String username, @PathVariable String password, @RequestBody Trainer trainer) {
         Trainer updatedTrainee = trainerService.updateTrainer(trainer.getUser().getUserName(), trainer);
         return ResponseEntity.ok(updatedTrainee.toString());
     }
-
-    @GetMapping("/list/{userName}")
-    public ResponseEntity<String> getNotAssignedActiveTrainers(@PathVariable String userName) {
+    @Authenticated
+    @GetMapping("/get_Trainers/{userName}/{password}")
+    public ResponseEntity<String> getNotAssignedActiveTrainers(@PathVariable String userName, @PathVariable String password) {
 
         List<Trainer> trainer = trainerService.getNotAssignedActiveTrainers(userName);
         if (trainer != null) {
@@ -65,8 +66,9 @@ public class TrainerController {
 
     }
 
-    @PatchMapping(value = "/change_status", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> activateDeactivateTrainee(@RequestBody Map<String, String> jsonData) {
+    @Authenticated
+    @PatchMapping(value = "/change_status/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> activateDeactivateTrainer(@PathVariable String username, @PathVariable String password, @RequestBody Map<String, String> jsonData) {
         trainerService.changeStatus(jsonData.get("username"));
         return ResponseEntity.ok().build();
     }

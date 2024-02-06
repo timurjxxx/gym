@@ -17,14 +17,9 @@ public class TrainingTypeService {
         this.trainingTypeDAO = trainingTypeDAO;
     }
 
-    public TrainingType createTrainingType(TrainingType trainingType) {
-        return trainingTypeDAO.save(trainingType);
+    public TrainingType findByTrainingName(String name) {
+        return trainingTypeDAO.findTrainingTypeByTrainingTypeName(name);
     }
-
-    public TrainingType getTrainingType(Long id) {
-        return trainingTypeDAO.findById(id).orElseThrow(EntityNotFoundException::new);
-    }
-
     public List<TrainingType> getAll() {
         return trainingTypeDAO.findAll();
     }

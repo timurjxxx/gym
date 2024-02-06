@@ -8,6 +8,7 @@ import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 
@@ -33,9 +34,8 @@ public class Training {
 
     @NotNull(message = "Training date cannot be null")
     @Future(message = "Training date must be in the future")
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Date trainingDate;
+    private LocalDate trainingDate;
 
     @NotNull(message = "Training duration cannot be null")
     @Positive(message = "Training duration must be a positive number")

@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface TrainingTypeDAO extends JpaRepository<TrainingType, Long> {
 
 
+    TrainingType findTrainingTypeByTrainingTypeName(String name);
+
 }

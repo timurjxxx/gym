@@ -2,7 +2,9 @@ package org.gym.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -10,9 +12,11 @@ import java.util.Date;
 public class TrainingSearchCriteria {
 
     private String trainingName;
-    private Date trainingStartDate;
-    private Date trainingEndDate;
+    private LocalDate trainingStartDate;
+    private LocalDate trainingEndDate;
     private Integer trainingDuration;
+
+    private TrainingType trainingTypes;
 
     @Override
     public String toString() {

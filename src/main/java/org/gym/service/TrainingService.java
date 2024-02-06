@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import java.util.*;
 
@@ -32,11 +33,11 @@ public class TrainingService {
     }
 
     @Transactional
-    public Training addTraining(Training training, String trainerName, String traineeName, Long trainingTypeId) {
+    public Training addTraining(Training training, String trainerName, String traineeName, String trainingTypeName) {
         training.setTrainer(trainerService.selectTrainerByUserName(trainerName));
         training.setTrainee(traineeService.selectTraineeByUserName(traineeName));
-        training.setTrainingTypes(trainingTypeService.getTrainingType(trainingTypeId));
-        LOGGER.info("Added training with trainer name {}, and trainee name {} and trainingtype id {}", trainerName, traineeName, trainingTypeId);
+        training.setTrainingTypes(trainingTypeService.findByTrainingName(trainingTypeName));
+        LOGGER.info("Added training with trainer name {}, and trainee name {} and trainingtype {}", trainerName, traineeName, trainingTypeName);
         LOGGER.debug("Added training details: {}", training);
 
         return trainingDAO.save(training);
@@ -46,7 +47,7 @@ public class TrainingService {
         Trainer trainer = trainerService.selectTrainerByUserName(trainerUsername);
         LOGGER.info("Get trainer with username: {}", trainerUsername);
         LOGGER.debug("Trainer details: {}", trainer);
-        LOGGER.debug("Criterie details: {}", criteria);
+        LOGGER.debug("Criteria details: {}", criteria);
 
         return trainingDAO.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -58,11 +59,17 @@ public class TrainingService {
                     predicates.add(cb.between(root.get("trainingDate"), c.getTrainingStartDate(), c.getTrainingEndDate()));
                 }
                 Optional.ofNullable(c.getTrainingDuration()).ifPresent(v -> predicates.add(cb.equal(root.get("trainingDuration"), v)));
+
+                Optional.ofNullable(c.getTrainingTypes()).ifPresent(trainingType -> {
+                    Join<Training, TrainingType> trainingTypeJoin = root.join("trainingType");
+                    predicates.add(cb.equal(trainingTypeJoin.get("trainingTypeName"), trainingType.getTrainingTypeName()));
+                });
             });
 
             return cb.and(predicates.toArray(new Predicate[0]));
         });
     }
+
 
     public List<Training> getTraineeTrainingsByCriteria(String traineeUsername, TrainingSearchCriteria criteria) {
         Trainee trainee = traineeService.selectTraineeByUserName(traineeUsername);
@@ -81,8 +88,12 @@ public class TrainingService {
                     predicates.add(cb.between(root.get("trainingDate"), c.getTrainingStartDate(), c.getTrainingEndDate()));
                 }
                 Optional.ofNullable(c.getTrainingDuration()).ifPresent(v -> predicates.add(cb.equal(root.get("trainingDuration"), v)));
-            });
 
+                Optional.ofNullable(c.getTrainingTypes()).ifPresent(trainingType -> {
+                    Join<Training, TrainingType> trainingTypeJoin = root.join("trainingType");
+                    predicates.add(cb.equal(trainingTypeJoin.get("trainingTypeName"), trainingType.getTrainingTypeName()));
+                });
+            });
             return cb.and(predicates.toArray(new Predicate[0]));
         });
     }

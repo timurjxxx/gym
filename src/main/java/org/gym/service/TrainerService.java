@@ -34,9 +34,9 @@ public class TrainerService {
     }
 
     @Transactional
-    public Trainer createTrainer(Trainer trainer, User user, TrainingType trainingType) {
+    public Trainer createTrainer(Trainer trainer, User user, String  trainingTypeName) {
         trainer.setUser(userService.createUser(user));
-        trainer.setSpecialization(trainingTypeService.createTrainingType(trainingType));
+        trainer.setSpecialization(trainingTypeService.findByTrainingName(trainingTypeName));
         return trainerDAO.save(trainer);
     }
 
