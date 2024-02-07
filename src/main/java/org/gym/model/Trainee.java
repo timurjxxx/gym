@@ -72,11 +72,9 @@ public class Trainee {
 
     @Override
     public String toString() {
-        return "Trainee{" + (user != null ? user.getUserName() : null) +
+        return "Trainee{" + (user != null ? user : null) +
                 ", dateOfBirth=" + dateOfBirth +
                 ", address='" + address + '\'' +
-                ", traineeTrainingsCount=" + (traineeTrainings != null ? traineeTrainings.size() : 0) +
-                ", trainersCount=" + (trainers != null ? trainers.size() : 0) +
                 '}';
     }
 

@@ -1,8 +1,6 @@
 package org.gym.service;
 
 import org.gym.dao.TrainingDAO;
-import org.gym.dto.TrainingDTO;
-import org.gym.mapper.TrainingMapper;
 import org.gym.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +22,6 @@ public class TrainingService {
     private final TrainerService trainerService;
     private final TraineeService traineeService;
 
-    private final TrainingMapper mapper = TrainingMapper.INSTANCE;
     private final TrainingTypeService trainingTypeService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainingService.class);
@@ -101,10 +98,6 @@ public class TrainingService {
             });
             return cb.and(predicates.toArray(new Predicate[0]));
         });
-    }
-
-    public List<Training> findall() {
-        return trainingDAO.findAll();
     }
 
 

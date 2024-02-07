@@ -47,14 +47,12 @@ public class AppConfigTest {
 
     @Test
     public void testDataSource() throws NoSuchFieldException, IllegalAccessException {
-        // Mocking properties
         Environment environment = mock(Environment.class);
         when(environment.getProperty("spring.datasource.url")).thenReturn("jdbc:postgresql://localhost:5432/postgres");
         when(environment.getProperty("spring.datasource.driverClassName")).thenReturn("org.postgresql.Driver");
         when(environment.getProperty("spring.datasource.username")).thenReturn("postgres");
         when(environment.getProperty("spring.datasource.password")).thenReturn("gamer120");
 
-        // Testing dataSource method
         AppConfig appConfig = new AppConfig();
         setPrivateField(appConfig, "url", "jdbc:postgresql://localhost:5432/postgres");
         setPrivateField(appConfig, "className", "org.postgresql.Driver");
@@ -64,7 +62,6 @@ public class AppConfigTest {
         DataSource dataSource = appConfig.dataSource();
         assertTrue(dataSource instanceof DriverManagerDataSource);
 
-        // Add additional assertions as needed based on your specific requirements
     }
 
 
@@ -81,10 +78,8 @@ public class AppConfigTest {
 
     @Test
     void testHibernateProperties() throws NoSuchFieldException, IllegalAccessException {
-        // Создаем экземпляр AppConfig
         AppConfig appConfig = new AppConfig();
 
-        // Устанавливаем значения полей напрямую
         setPrivateField(appConfig, "url", "jdbc:postgresql://localhost:5432/postgres");
         setPrivateField(appConfig, "className", "org.postgresql.Driver");
         setPrivateField(appConfig, "username", "postgres");
@@ -93,10 +88,8 @@ public class AppConfigTest {
         setPrivateField(appConfig, "show_sql", "true");
         setPrivateField(appConfig, "auto_sql", "update");
 
-        // Вызываем метод, который хотим протестировать
         Properties result = appConfig.hibernateProperties();
 
-        // Проверяем, что возвращенные свойства соответствуют установленным значениям
         assertEquals("org.hibernate.dialect.PostgreSQLDialect", result.getProperty("hibernate.dialect"));
         assertEquals("true", result.getProperty("hibernate.show_sql"));
         assertEquals("update", result.getProperty("hibernate.hbm2ddl.auto"));

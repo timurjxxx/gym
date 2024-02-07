@@ -1,15 +1,11 @@
 package org.gym.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class TrainingSearchCriteria {
@@ -21,13 +17,5 @@ public class TrainingSearchCriteria {
 
     private TrainingType trainingTypes;
 
-    @Override
-    public String toString() {
-        return "TrainingSearchCriteria{" +
-                "trainingName='" + trainingName + '\'' +
-                ", trainingStartDate=" + trainingStartDate +
-                ", trainingEndDate=" + trainingEndDate +
-                ", trainingDuration=" + trainingDuration +
-                '}';
-    }
+
 }

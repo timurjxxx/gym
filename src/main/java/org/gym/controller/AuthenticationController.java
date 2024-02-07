@@ -29,13 +29,14 @@ public class AuthenticationController {
     @ApiOperation("Create a new user")
     public ResponseEntity<Void> login(@PathVariable String username, @PathVariable String password) {
 
-        return ResponseEntity.ok().build();
+            return ResponseEntity.ok().build();
+
     }
 
     @Authenticated
     @PutMapping(value = "/changeLogin/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation("Create a new user")
-    public ResponseEntity<Void> changeLogin(@PathVariable String username, @PathVariable String password, @RequestBody Map <String ,String > newPassword) {
+    public ResponseEntity<Void> changeLogin(@PathVariable String username, @PathVariable String password, @RequestBody Map<String, String> newPassword) {
 
         userService.changePassword(username, newPassword.get("newPassword"));
         return ResponseEntity.ok().build();

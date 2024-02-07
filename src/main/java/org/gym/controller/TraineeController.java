@@ -43,7 +43,7 @@ public class TraineeController {
 
         Trainee trainee = traineeService.selectTraineeByUserName(username);
         if (trainee != null) {
-            return ResponseEntity.ok(trainee.toString());
+            return ResponseEntity.ok(trainee + trainee.getTrainers().toString());
 
         } else {
             throw new EntityNotFoundException("Not found");
@@ -55,7 +55,7 @@ public class TraineeController {
     @PutMapping(value = "/update_Trainee/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateTraineeProfile(@PathVariable String username, @PathVariable String password, @RequestBody Trainee trainee) {
         Trainee updatedTrainee = traineeService.updateTrainee(trainee.getUser().getUserName(), trainee);
-        return ResponseEntity.ok(updatedTrainee.toString());
+        return ResponseEntity.ok(updatedTrainee.toString() + updatedTrainee.getTrainers().toString());
     }
 
     @Authenticated
@@ -75,7 +75,7 @@ public class TraineeController {
             trainers.add(trainerService.selectTrainerByUserName(item));
         }
         Trainee updatedTrainee = traineeService.updateTraineeTrainersList(traineeUsername, trainers);
-        return ResponseEntity.ok(updatedTrainee.toString());
+        return ResponseEntity.ok(updatedTrainee.getTrainers().toString());
     }
 
     @Authenticated

@@ -1,64 +1,78 @@
-//package org.serviceTest;
-//
-//import org.gym.dao.TrainingTypeDAO;
-//import org.gym.model.TrainingType;
-//import org.gym.service.TrainingTypeService;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.MockitoAnnotations;
-//
-//import javax.persistence.EntityNotFoundException;
-//import java.util.Optional;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.*;
-//
-//public class TrainingTypeServiceTest {
-//
-//    @Mock
-//    private TrainingTypeDAO trainingTypeDAO;
-//
-//    @InjectMocks
-//    private TrainingTypeService trainingTypeService;
-//
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.initMocks(this);
-//    }
-//
-//    @Test
-//    void testCreateTrainingType() {
-//        TrainingType trainingTypeToSave = new TrainingType();
-//        when(trainingTypeDAO.save(any(TrainingType.class))).thenReturn(trainingTypeToSave);
-//
-//        TrainingType savedTrainingType = trainingTypeService.createTrainingType(new TrainingType());
-//
-//        assertNotNull(savedTrainingType);
-//        verify(trainingTypeDAO, times(1)).save(any(TrainingType.class));
-//    }
-//
-//    @Test
-//    void testGetTrainingType() {
-//        Long trainingTypeId = 1L;
-//        TrainingType trainingType = new TrainingType();
-//        when(trainingTypeDAO.findById(trainingTypeId)).thenReturn(Optional.of(trainingType));
-//
-//        TrainingType retrievedTrainingType = trainingTypeService.getTrainingType(trainingTypeId);
-//
-//        assertNotNull(retrievedTrainingType);
-//        assertEquals(trainingType, retrievedTrainingType);
-//        verify(trainingTypeDAO, times(1)).findById(trainingTypeId);
-//    }
-//
-//    @Test
-//    void testGetTrainingTypeNotFound() {
-//        Long nonExistentTrainingTypeId = 999L;
-//        when(trainingTypeDAO.findById(nonExistentTrainingTypeId)).thenReturn(Optional.empty());
-//
-//        assertThrows(EntityNotFoundException.class, () -> trainingTypeService.getTrainingType(nonExistentTrainingTypeId));
-//
-//        verify(trainingTypeDAO, times(1)).findById(nonExistentTrainingTypeId);
-//    }
-//}
+package org.serviceTest;
+
+import org.gym.dao.TrainingTypeDAO;
+import org.gym.model.TrainingType;
+import org.gym.service.TrainingTypeService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import javax.persistence.EntityNotFoundException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+public class TrainingTypeServiceTest {
+
+    @Mock
+    private TrainingTypeDAO trainingTypeDAO;
+
+    @InjectMocks
+    private TrainingTypeService trainingTypeService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
+
+
+
+    @Test
+    void testGetTrainingType() {
+        String  name = "test_name";
+        TrainingType trainingType = new TrainingType();
+        when(trainingTypeDAO.findTrainingTypeByTrainingTypeName(name)).thenReturn(trainingType);
+
+        TrainingType retrievedTrainingType = trainingTypeService.findByTrainingName(name);
+
+        assertNotNull(retrievedTrainingType);
+        assertEquals(trainingType, retrievedTrainingType);
+        verify(trainingTypeDAO, times(1)).findTrainingTypeByTrainingTypeName(name);
+    }
+    @Test
+    void testGetAllTrainingTypes() {
+        TrainingType trainingType1 = new TrainingType();
+        trainingType1.setId(1L);
+        trainingType1.setTrainingTypeName("Cardio");
+
+        TrainingType trainingType2 = new TrainingType();
+        trainingType2.setId(2L);
+        trainingType2.setTrainingTypeName("Strength");
+
+        List<TrainingType> trainingTypes = Arrays.asList(trainingType1, trainingType2);
+
+        TrainingTypeDAO trainingTypeDAO = mock(TrainingTypeDAO.class);
+        when(trainingTypeDAO.findAll()).thenReturn(trainingTypes);
+
+        TrainingTypeService trainingTypeService = new TrainingTypeService(trainingTypeDAO);
+
+        List<TrainingType> result = trainingTypeService.getAll();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        assertEquals(trainingType1.getId(), result.get(0).getId());
+        assertEquals(trainingType1.getTrainingTypeName(), result.get(0).getTrainingTypeName());
+
+        assertEquals(trainingType2.getId(), result.get(1).getId());
+        assertEquals(trainingType2.getTrainingTypeName(), result.get(1).getTrainingTypeName());
+
+        verify(trainingTypeDAO, times(1)).findAll();
+    }
+
+}

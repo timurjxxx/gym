@@ -60,9 +60,10 @@ public class Trainer {
 
     @Override
     public String toString() {
-        return "Trainer{" + user +
+        return "Trainer{" +"First name=' " + user.getFirstName() + '\''+
+                "Last name=' " + user.getLastName() + '\'' +
                 "specialization='" + specialization.getTrainingTypeName() + '\'' +
-                ", trainees list=" + (trainees != null ? trainees : 0) +
+                ",Trainees list =" + (trainees != null ? trainees : 0) +
                 '}';
     }
 }

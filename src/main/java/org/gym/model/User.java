@@ -43,8 +43,6 @@ public class User {
     public String toString() {
         return  "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", userName='" + userName + '\'' +
-                ", password='" + password + '\'' +
                 ", isActive=" + isActive + '\t';
     }
 

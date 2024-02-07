@@ -1,122 +1,74 @@
 package org.modelTest;
 
 import org.gym.model.TrainingSearchCriteria;
+import org.gym.model.TrainingType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TrainingSearchCriteriaTest {
 
+
     @Test
-    void testGettersAndSetters() {
+    public void testGetterAndSetterForTrainingName() {
         TrainingSearchCriteria criteria = new TrainingSearchCriteria();
-
-        criteria.setTrainingName("Yoga");
-        criteria.setTrainingStartDate(new Date());
-        criteria.setTrainingEndDate(new Date());
-        criteria.setTrainingDuration(60);
-
-        assertEquals("Yoga", criteria.getTrainingName());
-        assertNotNull(criteria.getTrainingStartDate());
-        assertNotNull(criteria.getTrainingEndDate());
-        assertEquals(60, criteria.getTrainingDuration());
+        String trainingName = "TestTraining";
+        criteria.setTrainingName(trainingName);
+        assertEquals(trainingName, criteria.getTrainingName());
     }
 
     @Test
-    void testEqualsAndHashCode() {
-        TrainingSearchCriteria criteria1 = new TrainingSearchCriteria();
-        criteria1.setTrainingName("Yoga");
-        criteria1.setTrainingStartDate(new Date());
-        criteria1.setTrainingEndDate(new Date());
-        criteria1.setTrainingDuration(60);
-
-        TrainingSearchCriteria criteria2 = new TrainingSearchCriteria();
-        criteria2.setTrainingName("Yoga");
-        criteria2.setTrainingStartDate(new Date());
-        criteria2.setTrainingEndDate(new Date());
-        criteria2.setTrainingDuration(60);
-
-        assertEquals(criteria1, criteria2);
-        assertEquals(criteria1.hashCode(), criteria2.hashCode());
-
-        TrainingSearchCriteria criteria3 = new TrainingSearchCriteria();
-        criteria3.setTrainingName("Pilates");
-        criteria3.setTrainingStartDate(new Date());
-        criteria3.setTrainingEndDate(new Date());
-        criteria3.setTrainingDuration(45);
-
-        assertNotEquals(criteria1, criteria3);
-        assertNotEquals(criteria1.hashCode(), criteria3.hashCode());
-    }
-
-    @Test
-    void testToString() {
+    public void testGetterAndSetterForTrainingStartDate() {
         TrainingSearchCriteria criteria = new TrainingSearchCriteria();
-        criteria.setTrainingName("Yoga");
-        criteria.setTrainingStartDate(new Date());
-        criteria.setTrainingEndDate(new Date());
-        criteria.setTrainingDuration(60);
-
-        String expectedToString = "TrainingSearchCriteria{" +
-                "trainingName='Yoga', " +
-                "trainingStartDate=" + criteria.getTrainingStartDate() + ", " +
-                "trainingEndDate=" + criteria.getTrainingEndDate() + ", " +
-                "trainingDuration=60" +
-                "}";
-
-        assertEquals(expectedToString, criteria.toString());
-    }
-    @Test
-    void testEquals() {
-        TrainingSearchCriteria criteria1 = new TrainingSearchCriteria();
-        TrainingSearchCriteria criteria2 = new TrainingSearchCriteria();
-
-        // Проверка на равенство с самим собой
-        assertEquals(criteria1, criteria1);
-
-        // Проверка на равенство с другим пустым объектом
-        assertEquals(criteria1, criteria2);
-
-        // Изменение одного поля и проверка на неравенство
-        criteria1.setTrainingName("Training1");
-        assertNotEquals(criteria1, criteria2);
+        LocalDate startDate = LocalDate.now();
+        criteria.setTrainingStartDate(startDate);
+        assertEquals(startDate, criteria.getTrainingStartDate());
     }
 
     @Test
-    void testHashCode() {
-        TrainingSearchCriteria criteria1 = new TrainingSearchCriteria();
-        TrainingSearchCriteria criteria2 = new TrainingSearchCriteria();
-
-        // Проверка на равенство хэш-кодов у пустых объектов
-        assertEquals(criteria1.hashCode(), criteria2.hashCode());
-
-        // Изменение одного поля и проверка на неравенство хэш-кодов
-        criteria1.setTrainingName("Training1");
-        assertNotEquals(criteria1.hashCode(), criteria2.hashCode());
+    public void testGetterAndSetterForTrainingEndDate() {
+        TrainingSearchCriteria criteria = new TrainingSearchCriteria();
+        LocalDate endDate = LocalDate.now().plusDays(7);
+        criteria.setTrainingEndDate(endDate);
+        assertEquals(endDate, criteria.getTrainingEndDate());
     }
 
     @Test
-    void testEqualsAndHashCodee() {
-        TrainingSearchCriteria criteria1 = new TrainingSearchCriteria();
-        criteria1.setTrainingName("Training1");
-        criteria1.setTrainingStartDate(new Date(2022, 1, 1));
-        criteria1.setTrainingEndDate(new Date(2022, 1, 10));
-        criteria1.setTrainingDuration(5);
-
-        TrainingSearchCriteria criteria2 = new TrainingSearchCriteria();
-        criteria2.setTrainingName("Training1");
-        criteria2.setTrainingStartDate(new Date(2022, 1, 1));
-        criteria2.setTrainingEndDate(new Date(2022, 1, 10));
-        criteria2.setTrainingDuration(5);
-
-        // Проверка равенства
-        Assertions.assertEquals(criteria1, criteria2);
-
-        // Проверка hashCode
-        Assertions.assertEquals(criteria1.hashCode(), criteria2.hashCode());
+    public void testGetterAndSetterForTrainingDuration() {
+        TrainingSearchCriteria criteria = new TrainingSearchCriteria();
+        Integer duration = 10;
+        criteria.setTrainingDuration(duration);
+        assertEquals(duration, criteria.getTrainingDuration());
     }
+
+    @Test
+    public void testGetterAndSetterForTrainingTypes() {
+        TrainingSearchCriteria criteria = new TrainingSearchCriteria();
+        TrainingType trainingType = new TrainingType();
+        criteria.setTrainingTypes(trainingType);
+        assertEquals(trainingType, criteria.getTrainingTypes());
+    }
+
+    @Test
+    public void testAllArgsConstructor() {
+        String trainingName = "TestTraining";
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = LocalDate.now().plusDays(7);
+        Integer duration = 10;
+        TrainingType trainingType = new TrainingType();
+
+        TrainingSearchCriteria criteria = new TrainingSearchCriteria(trainingName, startDate, endDate, duration, trainingType);
+
+        assertEquals(trainingName, criteria.getTrainingName());
+        assertEquals(startDate, criteria.getTrainingStartDate());
+        assertEquals(endDate, criteria.getTrainingEndDate());
+        assertEquals(duration, criteria.getTrainingDuration());
+        assertEquals(trainingType, criteria.getTrainingTypes());
+    }
+
 }

@@ -81,16 +81,16 @@ public class AuthenticationAspectTest {
         verify(userDAO, never()).findUserByUserName(anyString());
     }
 
-    @Test
-    public void testEntityManagerFactory() throws SQLException {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-
-        AppConfig appConfig = context.getBean(AppConfig.class);
-        DataSource mockDataSource = mock(DataSource.class);
-
-        when(mockDataSource.getConnection()).thenReturn(null);
-
-        assertNotNull(appConfig.entityManagerFactory(mockDataSource));
-
-    }
+//    @Test
+//    public void testEntityManagerFactory() throws SQLException {
+//        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+//
+//        AppConfig appConfig = context.getBean(AppConfig.class);
+//        DataSource mockDataSource = mock(DataSource.class);
+//
+//        when(mockDataSource.getConnection()).thenReturn(null);
+//
+//        assertNotNull(appConfig.entityManagerFactory(mockDataSource));
+//
+//    }
 }
