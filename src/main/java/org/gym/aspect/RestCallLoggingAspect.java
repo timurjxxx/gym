@@ -39,14 +39,14 @@ public class RestCallLoggingAspect {
         LOGGER.info("REST Call Result: {}", extractResponseDetails(result));
     }
 
-    private String extractRequestParameters(HttpServletRequest request) {
+    public String extractRequestParameters(HttpServletRequest request) {
         StringBuilder parameters = new StringBuilder();
         request.getParameterMap().forEach((key, values) ->
                 parameters.append(key).append("=").append(String.join(",", values)).append("; "));
         return parameters.toString();
     }
 
-    private String extractResponseDetails(Object result) {
+    public String extractResponseDetails(Object result) {
         if (result instanceof org.springframework.http.ResponseEntity) {
             org.springframework.http.ResponseEntity<?> responseEntity = (org.springframework.http.ResponseEntity<?>) result;
             return "Status: " + responseEntity.getStatusCodeValue() + ", Response Body: " + responseEntity.getBody();
