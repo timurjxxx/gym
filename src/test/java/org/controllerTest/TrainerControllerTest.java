@@ -1,0 +1,118 @@
+package org.controllerTest;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.gym.controller.TraineeController;
+import org.gym.controller.TrainerController;
+import org.gym.model.Trainee;
+import org.gym.model.Trainer;
+import org.gym.model.TrainingType;
+import org.gym.model.User;
+import org.gym.service.TrainerService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+public class TrainerControllerTest {
+
+    @Mock
+    private TrainerService trainerService;
+
+    @InjectMocks
+    private TrainerController trainerController;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+
+    @Test
+    public void testCreateTrainer() {
+        TrainerService trainerServiceMock = mock(TrainerService.class);
+        TrainerController trainerController = new TrainerController(trainerServiceMock);
+
+        Trainer trainer = new Trainer();
+        User user = new User();
+        user.setFirstName("user");
+        user.setLastName("last name");
+        trainer.setUser(user);
+        trainer.setUser(new User());
+        trainer.setSpecialization(new TrainingType());
+
+        when(trainerServiceMock.createTrainer(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(trainer);
+
+        ResponseEntity<String> response = trainerController.createTrainer(trainer);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Username :" + trainer.getUser().getUserName() + " Password :" + trainer.getUser().getPassword(), response.getBody());
+    }
+
+    @Test
+    public void testGetTrainerProfile() {
+        String username = "testUser";
+        String password = "testPassword";
+        Trainer trainer = new Trainer();
+        trainer.setSpecialization(new TrainingType());
+        trainer.setUser(new User());
+        when(trainerService.selectTrainerByUserName(username)).thenReturn(trainer);
+
+        ResponseEntity<String> response = trainerController.getTrainerProfile(username, password);
+
+        assertEquals(ResponseEntity.ok(trainer.toString()), response);
+    }
+
+    @Test
+    public void testUpdateTrainerProfile() {
+
+        Trainer trainer = new Trainer();
+        trainer.setUser(new User());
+        trainer.setSpecialization(new TrainingType());
+
+        when(trainerService.updateTrainer(Mockito.any(), Mockito.any())).thenReturn(trainer);
+
+        ResponseEntity<String> response = trainerController.updateTrainerProfile("username", "password", trainer);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(trainer.toString(), response.getBody());
+    }
+
+    @Test
+    void getNotAssignedActiveTrainers() {
+        String userName = "user";
+        String password = "pass";
+        Trainer trainer = new Trainer();
+        trainer.setUser(new User());
+        trainer.setSpecialization(new TrainingType());
+        Trainer trainer2 = new Trainer();
+        trainer2.setUser(new User());
+        trainer2.setSpecialization(new TrainingType());
+
+        List<Trainer> trainers = new ArrayList<>();
+        trainers.add(trainer);
+        trainers.add(trainer2);
+        when(trainerService.getNotAssignedActiveTrainers(userName)).thenReturn(trainers);
+
+        ResponseEntity<String> response = trainerController.getNotAssignedActiveTrainers(userName, password);
+
+        assertEquals(ResponseEntity.ok(trainers.toString()), response);
+        verify(trainerService, times(1)).getNotAssignedActiveTrainers(userName);
+    }
+
+    @Test
+    public void testActivateDeactivateTrainer() {
+        TrainerService trainerServiceMock = mock(TrainerService.class);
+        TrainerController trainerController = new TrainerController(trainerServiceMock);
+
+        Map<String, String> jsonData = Collections.singletonMap("username", "someUsername");
+        ResponseEntity<Void> response = trainerController.activateDeactivateTrainer("username", "password", jsonData);
+        assertEquals(200, response.getStatusCodeValue());
+    }
+}
