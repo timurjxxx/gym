@@ -38,8 +38,8 @@ public class TraineeController {
     }
 
     @Authenticated
-    @GetMapping("/get_Trainee/{username}/{password}")
-    public ResponseEntity<String> getTraineeProfile(@PathVariable String username, @PathVariable String password) {
+    @GetMapping("/get_Trainee/{username}")
+    public ResponseEntity<String> getTraineeProfile(@PathVariable String username, @RequestHeader("password") String password) {
 
         Trainee trainee = traineeService.selectTraineeByUserName(username);
         if (trainee != null) {

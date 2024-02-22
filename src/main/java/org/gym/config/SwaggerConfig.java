@@ -19,7 +19,7 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any()) // Scan all controllers
+                .apis(RequestHandlerSelectors.basePackage("org.gym.controller")) // Scan all controllers
                 .paths(PathSelectors.any()) // Document all paths
                 .build()
                 .apiInfo(apiInfo());

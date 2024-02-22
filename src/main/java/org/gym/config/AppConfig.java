@@ -1,4 +1,5 @@
 package org.gym.config;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -9,6 +10,9 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -18,10 +22,9 @@ import java.util.Properties;
 @ComponentScan(basePackages = "org.gym")
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
-@EnableWebMvc
 @EnableJpaRepositories(basePackages = "org.gym.dao")
 @PropertySource(value = "classpath:application.properties")
-public class AppConfig {
+public class AppConfig implements WebMvcConfigurer {
 
     @Value("${spring.datasource.url}")
     private String url;
@@ -46,6 +49,7 @@ public class AppConfig {
     @Value("${hibernate.hbm2ddl.auto}")
     private
     String auto_sql;
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -73,11 +77,31 @@ public class AppConfig {
 
     public Properties hibernateProperties() {
         Properties properties = new Properties();
-        properties.setProperty("hibernate.dialect",  hibernateDialect);
+        properties.setProperty("hibernate.dialect", hibernateDialect);
         properties.setProperty("hibernate.show_sql", show_sql);
         properties.setProperty("hibernate.hbm2ddl.auto", auto_sql);
 
         return properties;
+    }
+
+    @Override
+    public void addViewControllers(final ViewControllerRegistry registry) {
+
+        registry.addViewController("/").setViewName("index");
+
+        registry.addViewController("/swagger-ui/").setViewName("forward:/swagger-ui/index.html");
+
+    }
+
+    @Override
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+
+        registry.addResourceHandler("/swagger-ui/**")
+
+                .addResourceLocations("classpath:/META-INF/resources/webjars/springfox-swagger-ui/")
+
+                .resourceChain(false);
+
     }
 
 

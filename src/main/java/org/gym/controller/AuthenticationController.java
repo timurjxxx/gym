@@ -1,6 +1,7 @@
 package org.gym.controller;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import org.gym.aspect.Authenticated;
 import org.gym.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class AuthenticationController {
 
     @Authenticated
     @GetMapping("/{username}/{password}")
-    @ApiOperation("Create a new user")
+    @ApiOperation(value = "GEt")
     public ResponseEntity<Void> login(@PathVariable String username, @PathVariable String password) {
 
             return ResponseEntity.ok().build();
@@ -34,8 +35,8 @@ public class AuthenticationController {
     }
 
     @Authenticated
+    @ApiOperation(value = "Change")
     @PutMapping(value = "/changeLogin/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation("Create a new user")
     public ResponseEntity<Void> changeLogin(@PathVariable String username, @PathVariable String password, @RequestBody Map<String, String> newPassword) {
 
         userService.changePassword(username, newPassword.get("newPassword"));
