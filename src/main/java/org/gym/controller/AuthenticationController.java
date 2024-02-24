@@ -26,11 +26,12 @@ public class AuthenticationController {
 
 
     @Authenticated
-    @GetMapping("/{username}/{password}")
-    @ApiOperation(value = "GEt")
-    public ResponseEntity<Void> login(@PathVariable String username, @PathVariable String password) {
+    @GetMapping("/sign_in")
+    @ApiOperation(value = "Login in to profile ")
+    public ResponseEntity<Void> login(@RequestBody String username, @RequestBody String password) {
 
-            return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok().build();
 
     }
 
@@ -42,5 +43,6 @@ public class AuthenticationController {
         userService.changePassword(username, newPassword.get("newPassword"));
         return ResponseEntity.ok().build();
     }
+
 
 }

@@ -1,5 +1,6 @@
 package org.gym.controller;
 
+import org.gym.aspect.Authenticated;
 import org.gym.model.Training;
 import org.gym.model.TrainingSearchCriteria;
 import org.gym.service.TrainingService;
@@ -39,23 +40,23 @@ public class TrainingController {
 
     }
 
+    @Authenticated
     @GetMapping(value = "/trainee/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getTraineeTrainingsByCriteria(@PathVariable String username, @RequestBody TrainingSearchCriteria criteria) {
+    public ResponseEntity<String> getTraineeTrainingsByCriteria(@PathVariable String username, @RequestHeader("password") String password, @RequestBody TrainingSearchCriteria criteria) {
 
         List<Training> trainings = trainingService.getTraineeTrainingsByCriteria(username, criteria);
         return ResponseEntity.ok(trainings.toString());
 
     }
 
+    @Authenticated
     @GetMapping(value = "/trainer/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getTrainerTrainingsByCriteria(@PathVariable String username, @RequestBody TrainingSearchCriteria criteria) {
+    public ResponseEntity<String> getTrainerTrainingsByCriteria(@PathVariable String username, @RequestHeader("password") String password, @RequestBody TrainingSearchCriteria criteria) {
 
         List<Training> trainings = trainingService.getTrainerTrainingsByCriteria(username, criteria);
         return ResponseEntity.ok(trainings.toString());
 
     }
-
-
 
 
 }

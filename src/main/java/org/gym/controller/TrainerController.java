@@ -33,8 +33,8 @@ public class TrainerController {
     }
 
     @Authenticated
-    @GetMapping("/get_Trainer/{username}/{password}")
-    public ResponseEntity<String> getTrainerProfile(@PathVariable String username, @PathVariable String password) {
+    @GetMapping("/get_Trainer/{username}")
+    public ResponseEntity<String> getTrainerProfile(@PathVariable String username,@RequestHeader("password") String password) {
 
         Trainer trainer = trainerService.selectTrainerByUserName(username);
         if (trainer != null) {
@@ -47,14 +47,14 @@ public class TrainerController {
     }
 
     @Authenticated
-    @PutMapping(value = "/update_Trainer/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTrainerProfile(@PathVariable String username, @PathVariable String password, @RequestBody Trainer trainer) {
+    @PutMapping(value = "/update_Trainer/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTrainerProfile(@PathVariable String username, @RequestHeader("password") String password, @RequestBody Trainer trainer) {
         Trainer updatedTrainee = trainerService.updateTrainer(trainer.getUser().getUserName(), trainer);
         return ResponseEntity.ok(updatedTrainee.toString());
     }
     @Authenticated
-    @GetMapping("/get_Trainers/{userName}/{password}")
-    public ResponseEntity<String> getNotAssignedActiveTrainers(@PathVariable String userName, @PathVariable String password) {
+    @GetMapping("/get_Trainers/{userName}")
+    public ResponseEntity<String> getNotAssignedActiveTrainers(@PathVariable String userName,@RequestHeader("password") String password) {
 
         List<Trainer> trainer = trainerService.getNotAssignedActiveTrainers(userName);
         if (trainer != null) {
@@ -67,8 +67,8 @@ public class TrainerController {
     }
 
     @Authenticated
-    @PatchMapping(value = "/change_status/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> activateDeactivateTrainer(@PathVariable String username, @PathVariable String password, @RequestBody Map<String, String> jsonData) {
+    @PatchMapping(value = "/change_status/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> activateDeactivateTrainer(@PathVariable String username,@RequestHeader("password") String password, @RequestBody Map<String, String> jsonData) {
         trainerService.changeStatus(jsonData.get("username"));
         return ResponseEntity.ok().build();
     }

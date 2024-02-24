@@ -52,22 +52,22 @@ public class TraineeController {
     }
 
     @Authenticated
-    @PutMapping(value = "/update_Trainee/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTraineeProfile(@PathVariable String username, @PathVariable String password, @RequestBody Trainee trainee) {
+    @PutMapping(value = "/update_Trainee/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTraineeProfile(@PathVariable String username, @RequestHeader("password") String password, @RequestBody Trainee trainee) {
         Trainee updatedTrainee = traineeService.updateTrainee(trainee.getUser().getUserName(), trainee);
         return ResponseEntity.ok(updatedTrainee.toString() + updatedTrainee.getTrainers().toString());
     }
 
     @Authenticated
-    @DeleteMapping("/delete_Trainee/{username}/{password}")
-    public ResponseEntity<Void> deleteTraineeProfile(@PathVariable String username, @PathVariable String password) {
+    @DeleteMapping("/delete_Trainee/{username}")
+    public ResponseEntity<Void> deleteTraineeProfile(@PathVariable String username, @RequestHeader("password") String password) {
         traineeService.deleteTraineeByUserName(username);
         return ResponseEntity.ok().build();
     }
 
     @Authenticated
-    @PutMapping(value = "/updateTrainersList/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTraineeTrainersList(@PathVariable String username, @PathVariable String password, @RequestBody Map<String, Object> jsonData) {
+    @PutMapping(value = "/updateTrainersList/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateTraineeTrainersList(@PathVariable String username, @RequestHeader("password") String password, @RequestBody Map<String, Object> jsonData) {
         String traineeUsername = (String) jsonData.get("traineeUsername");
         List<String> trainerUsernames = (List<String>) jsonData.get("trainerUsernames");
         Set<Trainer> trainers = new HashSet<>();
@@ -79,8 +79,8 @@ public class TraineeController {
     }
 
     @Authenticated
-    @PatchMapping(value = "/change_status/{username}/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> activateDeactivateTrainee(@PathVariable String username, @PathVariable String password, @RequestBody Map<String, String> jsonData) {
+    @PatchMapping(value = "/change_status/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> activateDeactivateTrainee(@PathVariable String username, @RequestHeader("password") String password, @RequestBody Map<String, String> jsonData) {
         traineeService.changeStatus(jsonData.get("username"));
         return ResponseEntity.ok().build();
     }

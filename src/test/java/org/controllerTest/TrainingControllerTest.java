@@ -55,12 +55,13 @@ class TrainingControllerTest {
     @Test
     void getTraineeTrainingsByCriteria() {
         String username = "trainee";
+        String password = "test";
         TrainingSearchCriteria criteria = new TrainingSearchCriteria();
         List<Training> trainings = Arrays.asList(new Training(), new Training());
 
         when(trainingService.getTraineeTrainingsByCriteria(username, criteria)).thenReturn(trainings);
 
-        ResponseEntity<String> response = trainingController.getTraineeTrainingsByCriteria(username, criteria);
+        ResponseEntity<String> response = trainingController.getTraineeTrainingsByCriteria(username,password,  criteria);
 
         assertEquals(ResponseEntity.ok(trainings.toString()), response);
         verify(trainingService, times(1)).getTraineeTrainingsByCriteria(username, criteria);
@@ -69,12 +70,13 @@ class TrainingControllerTest {
     @Test
     void getTrainerTrainingsByCriteria() {
         String username = "trainer";
+        String password = "test";
         TrainingSearchCriteria criteria = new TrainingSearchCriteria();
         List<Training> trainings = Arrays.asList(new Training(), new Training());
 
         when(trainingService.getTrainerTrainingsByCriteria(username, criteria)).thenReturn(trainings);
 
-        ResponseEntity<String> response = trainingController.getTrainerTrainingsByCriteria(username, criteria);
+        ResponseEntity<String> response = trainingController.getTrainerTrainingsByCriteria(username, password ,criteria);
 
         assertEquals(ResponseEntity.ok(trainings.toString()), response);
         verify(trainingService, times(1)).getTrainerTrainingsByCriteria(username, criteria);
