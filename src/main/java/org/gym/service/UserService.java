@@ -33,7 +33,6 @@ public class UserService {
         return userDAO.findById(userId).orElseThrow(() -> new UserNotFoundException("User is not found"));
     }
 
-    @Authenticated
     @Transactional(readOnly = true)
     public User findUserByUserName(String username) {
         LOGGER.info("Finding user by username: {}", username);
@@ -113,5 +112,10 @@ public class UserService {
         LOGGER.debug("Generated password: {}", sb.toString());
 
         return sb.toString();
+    }
+
+    @Authenticated
+    public void authenticated(String username, String password) {
+
     }
 }

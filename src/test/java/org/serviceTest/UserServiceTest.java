@@ -225,4 +225,16 @@ public class UserServiceTest {
         assertEquals(10, generatedPassword.length());
         assertTrue(generatedPassword.matches("[A-Za-z0-9]{10}"));
     }
+    @Test
+    public void testAuthenticated_ValidCredentials() {
+        // Arrange
+        String username = "validUsername";
+        String password = "validPassword";
+
+        // Act
+        userService.authenticated(username, password);
+
+        // Assert
+    }
+
 }

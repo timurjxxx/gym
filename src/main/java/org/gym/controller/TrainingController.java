@@ -1,5 +1,7 @@
 package org.gym.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.gym.aspect.Authenticated;
 import org.gym.model.Training;
 import org.gym.model.TrainingSearchCriteria;
@@ -17,6 +19,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/training", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(value = "Training Controller", description = "Operations related to training management")
 public class TrainingController {
 
     private final TrainingService trainingService;
@@ -30,6 +33,7 @@ public class TrainingController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Create a new training", response = ResponseEntity.class)
     public ResponseEntity<Void> createTraining(@RequestBody Training training) {
 
         String trainerName = training.getTrainer().getUser().getUserName();
@@ -41,8 +45,9 @@ public class TrainingController {
     }
 
     @Authenticated
-    @GetMapping(value = "/trainee/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getTraineeTrainingsByCriteria(@PathVariable String username, @RequestHeader("password") String password, @RequestBody TrainingSearchCriteria criteria) {
+    @GetMapping(value = "/trainee", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get trainee trainings by criteria", response = ResponseEntity.class)
+    public ResponseEntity<String> getTraineeTrainingsByCriteria(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody TrainingSearchCriteria criteria) {
 
         List<Training> trainings = trainingService.getTraineeTrainingsByCriteria(username, criteria);
         return ResponseEntity.ok(trainings.toString());
@@ -50,8 +55,9 @@ public class TrainingController {
     }
 
     @Authenticated
-    @GetMapping(value = "/trainer/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getTrainerTrainingsByCriteria(@PathVariable String username, @RequestHeader("password") String password, @RequestBody TrainingSearchCriteria criteria) {
+    @GetMapping(value = "/trainer", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get trainer trainings by criteria", response = ResponseEntity.class)
+    public ResponseEntity<String> getTrainerTrainingsByCriteria(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody TrainingSearchCriteria criteria) {
 
         List<Training> trainings = trainingService.getTrainerTrainingsByCriteria(username, criteria);
         return ResponseEntity.ok(trainings.toString());

@@ -1,5 +1,7 @@
 package org.gym.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.gym.aspect.Authenticated;
 import org.gym.model.Trainee;
 import org.gym.model.Trainer;
@@ -18,6 +20,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/trainee", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(value = "Trainee Controller", description = "Operations related to trainee management")
 public class TraineeController {
 
     private final TraineeService traineeService;
@@ -30,6 +33,8 @@ public class TraineeController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Create a new trainee", response = ResponseEntity.class)
+
     public ResponseEntity<String> createTrainee(@RequestBody Trainee trainee) {
 
         Trainee createdTrainee = traineeService.createTrainee(trainee, trainee.getUser());
@@ -38,8 +43,10 @@ public class TraineeController {
     }
 
     @Authenticated
-    @GetMapping("/get_Trainee/{username}")
-    public ResponseEntity<String> getTraineeProfile(@PathVariable String username, @RequestHeader("password") String password) {
+    @GetMapping("/get_Trainee")
+    @ApiOperation(value = "Get trainee profile by username", response = ResponseEntity.class)
+
+    public ResponseEntity<String> getTraineeProfile(@RequestHeader("username") String username, @RequestHeader("password") String password) {
 
         Trainee trainee = traineeService.selectTraineeByUserName(username);
         if (trainee != null) {
@@ -52,22 +59,28 @@ public class TraineeController {
     }
 
     @Authenticated
-    @PutMapping(value = "/update_Trainee/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTraineeProfile(@PathVariable String username, @RequestHeader("password") String password, @RequestBody Trainee trainee) {
+    @PutMapping(value = "/update_Trainee", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Update trainee profile by username", response = ResponseEntity.class)
+
+    public ResponseEntity<String> updateTraineeProfile(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody Trainee trainee) {
         Trainee updatedTrainee = traineeService.updateTrainee(trainee.getUser().getUserName(), trainee);
         return ResponseEntity.ok(updatedTrainee.toString() + updatedTrainee.getTrainers().toString());
     }
 
     @Authenticated
-    @DeleteMapping("/delete_Trainee/{username}")
-    public ResponseEntity<Void> deleteTraineeProfile(@PathVariable String username, @RequestHeader("password") String password) {
+    @DeleteMapping("/delete_Trainee")
+    @ApiOperation(value = "Delete trainee profile by username", response = ResponseEntity.class)
+
+    public ResponseEntity<Void> deleteTraineeProfile(@RequestHeader("username") String username, @RequestHeader("password") String password) {
         traineeService.deleteTraineeByUserName(username);
         return ResponseEntity.ok().build();
     }
 
     @Authenticated
-    @PutMapping(value = "/updateTrainersList/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateTraineeTrainersList(@PathVariable String username, @RequestHeader("password") String password, @RequestBody Map<String, Object> jsonData) {
+    @PutMapping(value = "/updateTrainersList", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Update trainee trainers list by username", response = ResponseEntity.class)
+
+    public ResponseEntity<String> updateTraineeTrainersList(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody Map<String, Object> jsonData) {
         String traineeUsername = (String) jsonData.get("traineeUsername");
         List<String> trainerUsernames = (List<String>) jsonData.get("trainerUsernames");
         Set<Trainer> trainers = new HashSet<>();
@@ -79,8 +92,10 @@ public class TraineeController {
     }
 
     @Authenticated
-    @PatchMapping(value = "/change_status/{username}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> activateDeactivateTrainee(@PathVariable String username, @RequestHeader("password") String password, @RequestBody Map<String, String> jsonData) {
+    @PatchMapping(value = "/change_status", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Activate or deactivate trainee by username", response = ResponseEntity.class)
+
+    public ResponseEntity<Void> activateDeactivateTrainee(@RequestHeader("username") String username, @RequestHeader("password") String password, @RequestBody Map<String, String> jsonData) {
         traineeService.changeStatus(jsonData.get("username"));
         return ResponseEntity.ok().build();
     }
